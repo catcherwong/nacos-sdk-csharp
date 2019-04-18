@@ -1,18 +1,18 @@
-# nacos-sdk-csharp 　　　　　　　　　　　　　　　　　　　　　　[中文](./README.zh-cn.md)
+# nacos-sdk-csharp 　　　　　　　　　　　　　　　　　　　　　　[English](./README.md)
 
-Unofficial csharp(dotnet core) implementation of [nacos](https://nacos.io/) OpenAPI.
+基于C#(dotnet core)实现 [nacos](https://nacos.io/) OpenAPI 的非官方版本
 
 ![](https://img.shields.io/nuget/v/nacos-sdk-csharp-unofficial.svg)
 
-## Installation
+## 安装Nuget包
 
 ```bash
 dotnet add package nacos-sdk-csharp-unofficial
 ```
 
-## Usages
+## 用法
 
-### Dependency Injection(DI)
+### 依赖注入
 
 ```cs
 public class Startup
@@ -21,7 +21,7 @@ public class Startup
     
     public void ConfigureServices(IServiceCollection services)
     {
-        // configuration
+        // 配置
         services.AddNacos(configure =>
         {
             configure.DefaultTimeOut = 8;
@@ -29,13 +29,13 @@ public class Startup
             configure.Namespace = "";
         });   
 
-        //// or read from configuration file
-        //services.AddNacos(Configuration);
+        // 或着从配置文件中读取
+        services.AddNacos(Configuration);
     }    
 }
 ```
 
-Sample of configuration file
+配置文件示例
 
 ```JSON
 {
@@ -49,13 +49,13 @@ Sample of configuration file
 
 ### INacosClient
 
-`INacosClient` is the entry of all opreations.
+所有的操作都通过`INacosClient`来进行。
 
-### Configuration Management
+### 配置管理
 
 ```cs
 
-// Get configurations
+// 获取Nacos上的配置
 var getConfigResult = await _client.GetConfigAsync(new GetConfigRequest
 {
     DataId = "dataId",
@@ -63,7 +63,7 @@ var getConfigResult = await _client.GetConfigAsync(new GetConfigRequest
     //Tenant = "tenant"
 });
 
-// Publish configuration
+// 发布 Nacos 上的配置
 var publishConfigRessult = await _client.PublishConfigAsync(new PublishConfigRequest
 {
     DataId = "dataId",
@@ -72,7 +72,7 @@ var publishConfigRessult = await _client.PublishConfigAsync(new PublishConfigReq
     Content = "test"
 });
 
-// Delete configuration
+// 删除 Nacos 上的配置
 var removeConfigResult = await _client.RemoveConfigAsync(new RemoveConfigRequest
 {
     DataId = "dataId",
@@ -82,10 +82,10 @@ var removeConfigResult = await _client.RemoveConfigAsync(new RemoveConfigRequest
 
 ```
 
-### Service Discovery
+### 服务发现
 
 ```cs
-// Register instance
+// 注册实例
 var registerInstance = await _client.RegisterInstanceAsync(new RegisterInstanceRequest
 {
     ServiceName = "testservice",
@@ -93,7 +93,7 @@ var registerInstance = await _client.RegisterInstanceAsync(new RegisterInstanceR
     Port = 9999
 });
 
-// Deregister instance
+// 注销实例
 var removeInstance = await _client.RemoveInstanceAsync(new RemoveInstanceRequest
 {
     ServiceName = "testservice",
@@ -101,7 +101,7 @@ var removeInstance = await _client.RemoveInstanceAsync(new RemoveInstanceRequest
     Port = 9999
 });
 
-// Modify instance
+// 修改实例
 var modifyInstance = await _client.ModifyInstanceAsync(new ModifyInstanceRequest
 {
     ServiceName = "testservice",
@@ -109,13 +109,13 @@ var modifyInstance = await _client.ModifyInstanceAsync(new ModifyInstanceRequest
     Port = 5000
 });
 
-// Query instances
+// 查询实例列表
 var listInstances = await _client.ListInstancesAsync(new ListInstancesRequest
 {
     ServiceName = "testservice",
 });
    
-// Query instance detail
+// 查询实例详情
 var getInstance = await _client.GetInstanceAsync(new GetInstanceRequest
 {
     ServiceName = "testservice",
@@ -123,7 +123,7 @@ var getInstance = await _client.GetInstanceAsync(new GetInstanceRequest
     Port = 9999,                 
 });
 
-// Send instance beat
+// 发送实例心跳
 var sendHeartbeat = await _client.SendHeartbeatAsync(new SendHeartbeatRequest
 {
     ServiceName = "testservice",
@@ -135,42 +135,42 @@ var sendHeartbeat = await _client.SendHeartbeatAsync(new SendHeartbeatRequest
     }
 });
     
-// Create service
+// 创建服务
 var createService = await _client.CreateServiceAsync(new CreateServiceRequest
 {
     ServiceName = "testservice"
 });
 
-// Delete service
+// 删除服务
 var removeService = await _client.RemoveServiceAsync(new RemoveServiceRequest
 {
     ServiceName = "testservice"
 });
 
-// Update service
+// 修改服务
 var modifyService = await _client.ModifyServiceAsync(new ModifyServiceRequest
 {
     ServiceName = "testservice",
     ProtectThreshold = 0.5,
 });
 
-// Query service
+// 查询服务
 var getService = await _client.GetServiceAsync(new GetServiceRequest
 {
     ServiceName = "testservice",
 });
 
-// Query service list
+// 查询服务列表
 var listServices = await _client.ListServicesAsync(new ListServicesRequest
 {
     PageNo = 1,
     PageSize = 2,
 });
 
-// Query system switches
+// 查询系统开关
 var getSwitches = await _client.GetSwitchesAsync();
 
-// Update system switch
+// 修改系统开关
 var modifySwitches = await _client.ModifySwitchesAsync(new ModifySwitchesRequest
 {
     Debug = true,
@@ -178,19 +178,19 @@ var modifySwitches = await _client.ModifySwitchesAsync(new ModifySwitchesRequest
     Value = "test"
 });
 
-// Query system metrics
+// 查看系统当前数据指标
 var getMetricsres = await _client.GetMetricsAsync();
 
-// Query server list
+// 查看当前集群Server列表
 var listClusterServers = await _client.ListClusterServersAsync(new ListClusterServersRequest
 {
         
 });
 
-// Query the leader of current cluster
+// 查看当前集群leader
 var getCurrentClusterLeader = await _client.GetCurrentClusterLeaderAsync();
 
-// Update instance health status
+// 更新实例的健康状态
 var modifyInstanceHealthStatus = await _client.ModifyInstanceHealthStatusAsync(new ModifyInstanceHealthStatusRequest
 {
     Ip = "192.168.0.74",
