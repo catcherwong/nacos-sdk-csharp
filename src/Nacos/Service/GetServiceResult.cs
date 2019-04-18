@@ -9,7 +9,7 @@
         public string NamespaceId { get; set; }
         public string Name { get; set; }
         public Selector Selector { get; set; }
-        public int ProtectThreshold { get; set; }
+        public double ProtectThreshold { get; set; }
         public List<Cluster> Clusters { get; set; }
     }   
 }

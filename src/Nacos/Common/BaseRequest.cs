@@ -1,7 +1,7 @@
 ﻿namespace Nacos
 {
     public abstract class BaseRequest
-    {
+    {        
         /// <summary>
         /// 将Request转成参数
         /// </summary>

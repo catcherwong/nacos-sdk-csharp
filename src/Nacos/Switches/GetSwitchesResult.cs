@@ -1,6 +1,7 @@
 ﻿namespace Nacos
 {
     using System;
+    using System.Collections.Generic;
 
     public class GetSwitchesResult
     {
@@ -26,14 +27,13 @@
 
         public MySqlHealthParams MysqlHealthParams { get; set; }
 
-        public Array IncrementalList { get; set; }
+        public List<string> IncrementalList { get; set; }
 
         public int ServerStatusSynchronizationPeriodMillis { get; set; }
-
         public int ServiceStatusSynchronizationPeriodMillis { get; set; }
         public bool DisableAddIP { get; set; }
         public bool SendBeatOnly { get; set; }
-        public object LimitedUrlMap { get; set; }
+        public Dictionary<string,string> LimitedUrlMap { get; set; }
         public int DistroServerExpiredMillis { get; set; }
         public string PushGoVersion { get; set; }
         public string PushJavaVersion { get; set; }
@@ -42,7 +42,7 @@
         public bool EnableAuthentication { get; set; }
         public string OverriddenServerStatus { get; set; }
         public bool DefaultInstanceEphemeral { get; set; }
-        public Array HealthCheckWhiteList { get; set; }
+        public List<string> HealthCheckWhiteList { get; set; }
         public string Checksum { get; set; }
 
     }

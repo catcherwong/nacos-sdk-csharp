@@ -8,7 +8,7 @@
     {
         public async Task<GetMetricsResult> GetMetricsAsync()
         {
-            var responseMessage = await DoRequestAsync(HttpMethod.Get, "/nacos/v1/ns/operator/metric");
+            var responseMessage = await DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/ns/operator/metrics");
             responseMessage.EnsureSuccessStatusCode();
 
             var result = await responseMessage.Content.ReadAsStringAsync();

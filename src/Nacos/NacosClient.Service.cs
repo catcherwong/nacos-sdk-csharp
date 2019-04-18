@@ -15,7 +15,7 @@
                 throw new RequestInValidException("request 参数不合法");
             }
 
-            var responseMessage = await DoRequestAsync(HttpMethod.Post, "/nacos/v1/ns/service", request.ToQueryString());
+            var responseMessage = await DoRequestAsync(HttpMethod.Post, $"{_options.EndPoint}/nacos/v1/ns/service", request.ToQueryString());
             responseMessage.EnsureSuccessStatusCode();
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -29,7 +29,7 @@
                 throw new RequestInValidException("request 参数不合法");
             }
 
-            var responseMessage = await DoRequestAsync(HttpMethod.Delete, "/nacos/v1/ns/service", request.ToQueryString());
+            var responseMessage = await DoRequestAsync(HttpMethod.Delete, $"{_options.EndPoint}/nacos/v1/ns/service", request.ToQueryString());
             responseMessage.EnsureSuccessStatusCode();
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -43,7 +43,7 @@
                 throw new RequestInValidException("request 参数不合法");
             }
 
-            var responseMessage = await DoRequestAsync(HttpMethod.Put, "/nacos/v1/ns/service", request.ToQueryString());
+            var responseMessage = await DoRequestAsync(HttpMethod.Put, $"{_options.EndPoint}/nacos/v1/ns/service", request.ToQueryString());
             responseMessage.EnsureSuccessStatusCode();
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -57,7 +57,7 @@
                 throw new RequestInValidException("request 参数不合法");
             }
 
-            var responseMessage = await DoRequestAsync(HttpMethod.Get, "/nacos/v1/ns/service", request.ToQueryString());
+            var responseMessage = await DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/ns/service", request.ToQueryString());
             responseMessage.EnsureSuccessStatusCode();
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -72,7 +72,7 @@
                 throw new RequestInValidException("request 参数不合法");
             }
 
-            var responseMessage = await DoRequestAsync(HttpMethod.Get, "/nacos/v1/ns/service/list", request.ToQueryString());
+            var responseMessage = await DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/ns/service/list", request.ToQueryString());
             responseMessage.EnsureSuccessStatusCode();
 
             var result = await responseMessage.Content.ReadAsStringAsync();

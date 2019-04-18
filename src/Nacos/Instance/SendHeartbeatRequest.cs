@@ -1,6 +1,7 @@
 ﻿namespace Nacos
 {
     using System.Text;
+    using Nacos.Utilities;
 
     public class SendHeartbeatRequest : BaseRequest
     {
@@ -12,7 +13,12 @@
         /// <summary>
         /// 实例心跳内容,JSON格式字符串
         /// </summary>
-        public string Beat { get; set; }
+        public string Beat => BeatInfo.ToJsonString();
+
+        /// <summary>
+        /// Beat信息
+        /// </summary>
+        public BeatInfo BeatInfo { get; set; }
 
         /// <summary>
         /// 分组名
@@ -26,7 +32,7 @@
 
         public override bool IsValid()
         {
-            return !string.IsNullOrWhiteSpace(Beat) && !string.IsNullOrWhiteSpace(ServiceName);
+            return BeatInfo != null && !string.IsNullOrWhiteSpace(ServiceName);
         }
 
         public override string ToQueryString()

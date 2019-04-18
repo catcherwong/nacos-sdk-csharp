@@ -15,7 +15,7 @@
                 throw new RequestInValidException("request 参数不合法");
             }
 
-            var responseMessage = await DoRequestAsync(HttpMethod.Post, "/nacos/v1/ns/instance", request.ToQueryString());
+            var responseMessage = await DoRequestAsync(HttpMethod.Post, $"{_options.EndPoint}/nacos/v1/ns/instance", request.ToQueryString());
             responseMessage.EnsureSuccessStatusCode();
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -29,7 +29,7 @@
                 throw new RequestInValidException("request 参数不合法");
             }
 
-            var responseMessage = await DoRequestAsync(HttpMethod.Delete, "/nacos/v1/ns/instance", request.ToQueryString());
+            var responseMessage = await DoRequestAsync(HttpMethod.Delete, $"{_options.EndPoint}/nacos/v1/ns/instance", request.ToQueryString());
             responseMessage.EnsureSuccessStatusCode();
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -43,7 +43,7 @@
                 throw new RequestInValidException("request 参数不合法");
             }
 
-            var responseMessage = await DoRequestAsync(HttpMethod.Put, "/nacos/v1/ns/instance", request.ToQueryString());
+            var responseMessage = await DoRequestAsync(HttpMethod.Put, $"{_options.EndPoint}/nacos/v1/ns/instance", request.ToQueryString());
             responseMessage.EnsureSuccessStatusCode();
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -57,7 +57,7 @@
                 throw new RequestInValidException("request 参数不合法");
             }
 
-            var responseMessage = await DoRequestAsync(HttpMethod.Get, "/nacos/v1/ns/instance/list", request.ToQueryString());
+            var responseMessage = await DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/ns/instance/list", request.ToQueryString());
             responseMessage.EnsureSuccessStatusCode();
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -72,7 +72,7 @@
                 throw new RequestInValidException("request 参数不合法");
             }
 
-            var responseMessage = await DoRequestAsync(HttpMethod.Get, "/nacos/v1/ns/instance", request.ToQueryString());
+            var responseMessage = await DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/ns/instance", request.ToQueryString());
             responseMessage.EnsureSuccessStatusCode();
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -87,7 +87,7 @@
                 throw new RequestInValidException("request 参数不合法");
             }
 
-            var responseMessage = await DoRequestAsync(HttpMethod.Put, "/nacos/v1/ns/instance/beat", request.ToQueryString());
+            var responseMessage = await DoRequestAsync(HttpMethod.Put, $"{_options.EndPoint}/nacos/v1/ns/instance/beat", request.ToQueryString());
             responseMessage.EnsureSuccessStatusCode();
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -101,11 +101,18 @@
                 throw new RequestInValidException("request 参数不合法");
             }
 
-            var responseMessage = await DoRequestAsync(HttpMethod.Put, "/nacos/v1/ns/health/instance", request.ToQueryString());
-            responseMessage.EnsureSuccessStatusCode();
+            var responseMessage = await DoRequestAsync(HttpMethod.Put, $"{_options.EndPoint}/nacos/v1/ns/health/instance", request.ToQueryString());
 
-            var result = await responseMessage.Content.ReadAsStringAsync();
-            return result.Equals("ok", StringComparison.OrdinalIgnoreCase);
+            switch (responseMessage.StatusCode)
+            {
+                case System.Net.HttpStatusCode.OK:
+                    var result = await responseMessage.Content.ReadAsStringAsync();
+                    return result.Equals("ok", StringComparison.OrdinalIgnoreCase);
+                case System.Net.HttpStatusCode.BadRequest:
+                    throw new NacosException((int)responseMessage.StatusCode, "health check is still working");
+                default:
+                    throw new NacosException((int)responseMessage.StatusCode, responseMessage.StatusCode.ToString());
+            }
         }
     }
 }

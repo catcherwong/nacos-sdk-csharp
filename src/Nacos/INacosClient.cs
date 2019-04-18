@@ -9,8 +9,8 @@
         /// <summary>
         /// 获取Nacos上的配置
         /// </summary>
-        /// <param name="request">request</param>
-        /// <returns></returns>
+        /// <param name="request">request</param>        
+        /// <returns></returns>        
         Task<string> GetConfigAsync(GetConfigRequest request);
 
         /// <summary>
@@ -26,6 +26,12 @@
         /// <param name="request">request</param>
         /// <returns></returns>
         Task<bool> RemoveConfigAsync(RemoveConfigRequest request);
+
+        /// <summary>
+        /// 监听 Nacos 上的配置
+        /// </summary>        
+        /// <returns></returns>
+        Task ListenerConfigAsync(ListenerConfigRequest request);
         #endregion
 
         #region Instance

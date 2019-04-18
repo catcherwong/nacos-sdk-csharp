@@ -1,6 +1,7 @@
 ﻿namespace Nacos.Utilities
 {
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     public static class JsonUtil
     {
@@ -14,6 +15,15 @@
             if (string.IsNullOrWhiteSpace(json)) return default(T);
 
             return JsonConvert.DeserializeObject<T>(json);
+        }
+
+        public static string GetPropValue(this string json, string prop)
+        {
+            if (string.IsNullOrWhiteSpace(json)) return string.Empty;
+
+            var jObj = JObject.Parse(json);
+
+            return jObj.Value<string>(prop);
         }
     }
 }

@@ -11,12 +11,13 @@
             var request = new GetConfigRequest
             {
                 DataId = "dataId",
-                Group = "group",
-                Tenant = "tenant"
+                Group = "DEFAULT_GROUP",
+                //Tenant = "tenant"
             };
 
             var res = await _client.GetConfigAsync(request);
             Assert.NotNull(res);
+            Assert.Equal("test", res);
         }
 
         [Fact]
@@ -25,8 +26,9 @@
             var request = new PublishConfigRequest
             {
                 DataId = "dataId",
-                Group = "group",
-                Tenant = "tenant"
+                Group = "DEFAULT_GROUP",
+                //Tenant = "tenant",
+                Content = "test"
             };
 
             var res = await _client.PublishConfigAsync(request);
@@ -39,12 +41,31 @@
             var request = new RemoveConfigRequest
             {
                 DataId = "dataId",
-                Group = "group",
-                Tenant = "tenant"
+                Group = "DEFAULT_GROUP",
+                //Tenant = "tenant"
             };
 
             var res = await _client.RemoveConfigAsync(request);
             Assert.True(res);
+        }
+
+        [Fact]
+        public async Task ListenerConfig_Should_Succeed()
+        {
+            var request = new ListenerConfigRequest
+            {
+                DataId = "dataId",
+                //Group = "DEFAULT_GROUP",
+                //Tenant = "tenant"
+            };
+
+            await _client.ListenerConfigAsync(request);
+
+            Assert.True(true);
+
+            await Task.Delay(50000);
+
+            
         }
     }
 }

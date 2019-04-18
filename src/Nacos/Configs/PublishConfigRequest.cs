@@ -26,7 +26,7 @@
 
         public override bool IsValid()
         {
-            return !string.IsNullOrWhiteSpace(DataId) && !string.IsNullOrWhiteSpace(Group) && !string.IsNullOrWhiteSpace(Content);
+            return !string.IsNullOrWhiteSpace(DataId) && !string.IsNullOrWhiteSpace(Content);
         }
 
         public override string ToQueryString()

@@ -17,7 +17,9 @@
         {
             var request = new ModifySwitchesRequest
             {
-
+                 Debug = true,
+                 Entry = "test",
+                 Value = "test"
             };
 
             var res = await _client.ModifySwitchesAsync(request);

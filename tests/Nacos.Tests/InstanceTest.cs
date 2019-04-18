@@ -10,9 +10,9 @@
         {
             var request = new RegisterInstanceRequest
             {
-                ServiceName = "aspnet",
-                Ip = "127.0.0.1",
-                Port = 5000
+                ServiceName = "testservice",
+                Ip = "192.168.0.74",
+                Port = 9999
             };
 
             var res = await _client.RegisterInstanceAsync(request);
@@ -24,9 +24,9 @@
         {
             var request = new RemoveInstanceRequest
             {
-                ServiceName = "aspnet",
-                Ip = "127.0.0.1",
-                Port = 5000
+                ServiceName = "testservice",
+                Ip = "192.168.0.74",
+                Port = 9999
             };
 
             var res = await _client.RemoveInstanceAsync(request);
@@ -38,8 +38,8 @@
         {
             var request = new ModifyInstanceRequest
             {
-                ServiceName = "aspnet",
-                Ip = "127.0.0.1",
+                ServiceName = "testservice",
+                Ip = "192.168.0.74",
                 Port = 5000
             };
 
@@ -52,7 +52,7 @@
         {
             var request = new ListInstancesRequest
             {
-                ServiceName = "aspnet",
+                ServiceName = "testservice",
             };
 
             var res = await _client.ListInstancesAsync(request);
@@ -64,9 +64,9 @@
         {
             var request = new GetInstanceRequest
             {
-                ServiceName = "aspnet",
-                Ip = "127.0.0.1",
-                Port = 5000
+                ServiceName = "testservice",
+                Ip = "192.168.0.74",
+                Port = 9999,                 
             };
 
             var res = await _client.GetInstanceAsync(request);
@@ -78,8 +78,13 @@
         {
             var request = new SendHeartbeatRequest
             {
-                ServiceName = "aspnet",
-                Beat = ""
+                ServiceName = "testservice",
+                BeatInfo = new BeatInfo
+                {
+                    ServiceName = "testservice",
+                    Ip = "192.168.0.74",
+                    Port = 9999,                     
+                }
             };
 
             var res = await _client.SendHeartbeatAsync(request);
@@ -91,14 +96,15 @@
         {
             var request = new ModifyInstanceHealthStatusRequest
             {
-                Ip = "127.0.0.1",
-                Port = 5000,
-                ServiceName = "aspnet",
-                Healthy = true,
+                Ip = "192.168.0.74",
+                Port = 9999,
+                ServiceName = "testservice",
+                Healthy = false,
             };
 
             var res = await _client.ModifyInstanceHealthStatusAsync(request);
-            Assert.True(res);
+            // 集群配置了健康检查时,该接口会返回错误
+            Assert.False(res);
         }
     }
 }

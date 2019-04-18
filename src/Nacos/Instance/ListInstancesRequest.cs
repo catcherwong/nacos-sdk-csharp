@@ -31,7 +31,7 @@
 
         public override bool IsValid()
         {
-            return string.IsNullOrWhiteSpace(ServiceName);
+            return !string.IsNullOrWhiteSpace(ServiceName);
         }
 
         public override string ToQueryString()

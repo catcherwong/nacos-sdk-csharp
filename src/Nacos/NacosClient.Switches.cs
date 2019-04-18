@@ -10,7 +10,7 @@
     {
         public async Task<GetSwitchesResult> GetSwitchesAsync()
         {
-            var responseMessage = await DoRequestAsync(HttpMethod.Get, "/nacos/v1/ns/operator/switches");
+            var responseMessage = await DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/ns/operator/switches");
             responseMessage.EnsureSuccessStatusCode();
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -25,7 +25,7 @@
                 throw new RequestInValidException("request 参数不合法");
             }
 
-            var responseMessage = await DoRequestAsync(HttpMethod.Put, "/nacos/v1/ns/operator/switches", request.ToQueryString());
+            var responseMessage = await DoRequestAsync(HttpMethod.Put, $"{_options.EndPoint}/nacos/v1/ns/operator/switches", request.ToQueryString());
             responseMessage.EnsureSuccessStatusCode();
 
             var result = await responseMessage.Content.ReadAsStringAsync();

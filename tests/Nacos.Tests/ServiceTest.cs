@@ -10,7 +10,7 @@
         {
             var request = new CreateServiceRequest
             {
-
+                ServiceName = "testservice"
             };
 
             var res = await _client.CreateServiceAsync(request);
@@ -22,7 +22,7 @@
         {
             var request = new RemoveServiceRequest
             {
-
+                ServiceName = "testservice"
             };
 
             var res = await _client.RemoveServiceAsync(request);
@@ -34,7 +34,8 @@
         {
             var request = new ModifyServiceRequest
             {
-
+                ServiceName = "testservice",
+                ProtectThreshold = 0.5,
             };
 
             var res = await _client.ModifyServiceAsync(request);
@@ -46,7 +47,7 @@
         {
             var request = new GetServiceRequest
             {
-
+                ServiceName = "testservice",
             };
 
             var res = await _client.GetServiceAsync(request);
@@ -58,7 +59,8 @@
         {
             var request = new ListServicesRequest
             {
-
+                PageNo = 1,
+                PageSize = 2,
             };
 
             var res = await _client.ListServicesAsync(request);

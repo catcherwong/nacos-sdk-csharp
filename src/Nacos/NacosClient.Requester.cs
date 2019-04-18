@@ -11,10 +11,11 @@
             var client = _clientFactory.CreateClient(ConstValue.ClientName);
             client.Timeout = TimeSpan.FromSeconds(_options.DefaultTimeOut);
 
-            var requestMessage = new HttpRequestMessage(method, $"{url}?{param}");
+            var requestUrl = string.IsNullOrWhiteSpace(param) ? url : $"{url}?{param}";
+
+            var requestMessage = new HttpRequestMessage(method, requestUrl);
             var responseMessage = await client.SendAsync(requestMessage);
             return responseMessage;
         }
-
     }
 }
