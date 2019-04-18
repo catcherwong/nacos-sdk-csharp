@@ -1,4 +1,4 @@
-# nacos-sdk-csharp 　　　　　　　　　　　　　　　　　　　　　　[中文](./README.zh-cn.md)
+# nacos-sdk-csharp 　　　　　　　　　　[中文](./README.zh-cn.md)
 
 Unofficial csharp(dotnet core) implementation of [nacos](https://nacos.io/) OpenAPI.
 

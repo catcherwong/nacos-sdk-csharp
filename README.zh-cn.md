@@ -1,4 +1,4 @@
-# nacos-sdk-csharp 　　　　　　　　　　　　　　　　　　　　　　[English](./README.md)
+# nacos-sdk-csharp 　　　　　　　　　　[English](./README.md)
 
 基于C#(dotnet core)实现 [nacos](https://nacos.io/) OpenAPI 的非官方版本
 
