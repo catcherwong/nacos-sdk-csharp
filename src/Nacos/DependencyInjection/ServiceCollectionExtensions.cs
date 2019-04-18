@@ -1,5 +1,6 @@
 ﻿namespace Nacos
 {
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using System;
@@ -13,9 +14,27 @@
             {
                 throw new ArgumentNullException(nameof(services));
             }
-          
+
             services.AddOptions();
             services.Configure(configure);
+
+            services.AddHttpClient(ConstValue.ClientName)
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler() { UseProxy = false });
+
+            services.TryAddSingleton<ILocalConfigInfoProcessor, MemoryLocalConfigInfoProcessor>();
+            services.AddSingleton<INacosClient, NacosClient>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddNacos(this IServiceCollection services, IConfiguration configuration, string sectionName = "nacos")
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.Configure<NacosOptions>(configuration.GetSection(sectionName));            
 
             services.AddHttpClient(ConstValue.ClientName)
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler() { UseProxy = false });
@@ -35,6 +54,25 @@
 
             services.AddOptions();
             services.Configure(configure);
+
+            services.AddHttpClient(ConstValue.ClientName)
+                .ConfigureHttpClient(httpClientAction)
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler() { UseProxy = false });
+
+            services.TryAddSingleton<ILocalConfigInfoProcessor, MemoryLocalConfigInfoProcessor>();
+            services.AddSingleton<INacosClient, NacosClient>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddNacos(this IServiceCollection services, IConfiguration configuration, Action<HttpClient> httpClientAction, string sectionName = "nacos")
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.Configure<NacosOptions>(configuration.GetSection(sectionName));   
 
             services.AddHttpClient(ConstValue.ClientName)
                 .ConfigureHttpClient(httpClientAction)
