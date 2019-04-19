@@ -1,4 +1,4 @@
-# nacos-sdk-csharp 　　　　　　　　　　[English](./README.md)
+# nacos-sdk-csharp 　　　　　　　　   　　[English](./README.md)
 
 基于C#(dotnet core)实现 [nacos](https://nacos.io/) OpenAPI 的非官方版本
 
@@ -47,13 +47,11 @@ public class Startup
 }
 ```
 
-### INacosClient
-
-所有的操作都通过`INacosClient`来进行。
-
 ### 配置管理
 
 ```cs
+// 通过依赖注入获取nacos的配置客户端
+var _client = IServiceProvider.GetService<INacosConfigClient>();
 
 // 获取Nacos上的配置
 var getConfigResult = await _client.GetConfigAsync(new GetConfigRequest
@@ -85,6 +83,9 @@ var removeConfigResult = await _client.RemoveConfigAsync(new RemoveConfigRequest
 ### 服务发现
 
 ```cs
+// 通过依赖注入获取nacos的服务发现客户端
+var _client = IServiceProvider.GetService<INacosConfigClient>();
+
 // 注册实例
 var registerInstance = await _client.RegisterInstanceAsync(new RegisterInstanceRequest
 {

@@ -2,12 +2,30 @@
 {
     public static class ConstValue
     {
+        /// <summary>
+        /// default httpclient name
+        /// </summary>
         public const string ClientName = "NacosClient";
 
+        /// <summary>
+        /// default group 
+        /// </summary>
         public const string DefaultGroup = "DEFAULT_GROUP";
 
+        /// <summary>
+        /// default long pulling timeout
+        /// </summary>
         public const int LongPullingTimeout = 30;
 
+        /// <summary>
+        /// invalid param
+        /// </summary>
+        public const int CLIENT_INVALID_PARAM = -400;
+
+        /// <summary>
+        /// over client threshold
+        /// </summary>
+        public const int CLIENT_OVER_THRESHOLD = -503;
 
         /// <summary>
         /// invalid param

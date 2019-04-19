@@ -6,7 +6,8 @@
 
     public class TestBase
     {
-        protected INacosClient _client;
+        protected INacosNamingClient _namingClient;
+        protected INacosConfigClient _configClient;
 
         public TestBase()
         {
@@ -18,7 +19,8 @@
             });
 
             IServiceProvider serviceProvider = services.BuildServiceProvider();
-            _client = serviceProvider.GetService<INacosClient>();
+            _namingClient = serviceProvider.GetService<INacosNamingClient>();
+            _configClient = serviceProvider.GetService<INacosConfigClient>();
         }
     }
 }

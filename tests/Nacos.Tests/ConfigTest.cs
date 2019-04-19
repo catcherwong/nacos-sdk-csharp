@@ -15,7 +15,7 @@
                 //Tenant = "tenant"
             };
 
-            var res = await _client.GetConfigAsync(request);
+            var res = await _configClient.GetConfigAsync(request);
             Assert.NotNull(res);
             Assert.Equal("test", res);
         }
@@ -31,7 +31,7 @@
                 Content = "test"
             };
 
-            var res = await _client.PublishConfigAsync(request);
+            var res = await _configClient.PublishConfigAsync(request);
             Assert.True(res);
         }
 
@@ -45,7 +45,7 @@
                 //Tenant = "tenant"
             };
 
-            var res = await _client.RemoveConfigAsync(request);
+            var res = await _configClient.RemoveConfigAsync(request);
             Assert.True(res);
         }
 
@@ -59,7 +59,7 @@
                 //Tenant = "tenant"
             };
 
-            await _client.ListenerConfigAsync(request);
+            await _configClient.ListenerConfigAsync(request);
 
             Assert.True(true);
 

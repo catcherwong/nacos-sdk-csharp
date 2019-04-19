@@ -13,14 +13,14 @@
                  
             };
 
-            var res = await _client.ListClusterServersAsync(request);
+            var res = await _namingClient.ListClusterServersAsync(request);
             Assert.NotNull(res);
         }
 
         [Fact]
         public async Task GetCurrentClusterLeader_Should_Succeed()
         {          
-            var res = await _client.GetCurrentClusterLeaderAsync();
+            var res = await _namingClient.GetCurrentClusterLeaderAsync();
             Assert.NotNull(res);
         }
     }

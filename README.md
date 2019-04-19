@@ -1,4 +1,4 @@
-# nacos-sdk-csharp 　　　　　　　　　　[中文](./README.zh-cn.md)
+# nacos-sdk-csharp 　　　　　   　　　　　[中文](./README.zh-cn.md)
 
 Unofficial csharp(dotnet core) implementation of [nacos](https://nacos.io/) OpenAPI.
 
@@ -47,13 +47,11 @@ Sample of configuration file
 }
 ```
 
-### INacosClient
-
-`INacosClient` is the entry of all opreations.
-
 ### Configuration Management
 
 ```cs
+// Get the nacos config client via DI
+var _client = IServiceProvider.GetService<INacosConfigClient>();
 
 // Get configurations
 var getConfigResult = await _client.GetConfigAsync(new GetConfigRequest
@@ -85,6 +83,9 @@ var removeConfigResult = await _client.RemoveConfigAsync(new RemoveConfigRequest
 ### Service Discovery
 
 ```cs
+// Get the nacos naming client via DI
+var _client = IServiceProvider.GetService<INacosNamingClient>();
+
 // Register instance
 var registerInstance = await _client.RegisterInstanceAsync(new RegisterInstanceRequest
 {

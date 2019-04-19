@@ -13,7 +13,7 @@
                 ServiceName = "testservice"
             };
 
-            var res = await _client.CreateServiceAsync(request);
+            var res = await _namingClient.CreateServiceAsync(request);
             Assert.True(res);
         }
 
@@ -25,7 +25,7 @@
                 ServiceName = "testservice"
             };
 
-            var res = await _client.RemoveServiceAsync(request);
+            var res = await _namingClient.RemoveServiceAsync(request);
             Assert.True(res);
         }
 
@@ -35,10 +35,10 @@
             var request = new ModifyServiceRequest
             {
                 ServiceName = "testservice",
-                ProtectThreshold = 0.5,
+                ProtectThreshold = 0.5f,
             };
 
-            var res = await _client.ModifyServiceAsync(request);
+            var res = await _namingClient.ModifyServiceAsync(request);
             Assert.True(res);
         }
 
@@ -50,7 +50,7 @@
                 ServiceName = "testservice",
             };
 
-            var res = await _client.GetServiceAsync(request);
+            var res = await _namingClient.GetServiceAsync(request);
             Assert.NotNull(res);
         }
 
@@ -63,7 +63,7 @@
                 PageSize = 2,
             };
 
-            var res = await _client.ListServicesAsync(request);
+            var res = await _namingClient.ListServicesAsync(request);
             Assert.NotNull(res);
         }
     }

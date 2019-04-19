@@ -15,7 +15,7 @@
                 Port = 9999
             };
 
-            var res = await _client.RegisterInstanceAsync(request);
+            var res = await _namingClient.RegisterInstanceAsync(request);
             Assert.True(res);
         }
 
@@ -29,7 +29,7 @@
                 Port = 9999
             };
 
-            var res = await _client.RemoveInstanceAsync(request);
+            var res = await _namingClient.RemoveInstanceAsync(request);
             Assert.True(res);
         }
 
@@ -43,7 +43,7 @@
                 Port = 5000
             };
 
-            var res = await _client.ModifyInstanceAsync(request);
+            var res = await _namingClient.ModifyInstanceAsync(request);
             Assert.True(res);
         }
 
@@ -55,7 +55,7 @@
                 ServiceName = "testservice",
             };
 
-            var res = await _client.ListInstancesAsync(request);
+            var res = await _namingClient.ListInstancesAsync(request);
             Assert.NotNull(res);
         }
 
@@ -69,7 +69,7 @@
                 Port = 9999,                 
             };
 
-            var res = await _client.GetInstanceAsync(request);
+            var res = await _namingClient.GetInstanceAsync(request);
             Assert.NotNull(res);
         }
 
@@ -87,7 +87,7 @@
                 }
             };
 
-            var res = await _client.SendHeartbeatAsync(request);
+            var res = await _namingClient.SendHeartbeatAsync(request);
             Assert.True(res);
         }
 
@@ -102,7 +102,7 @@
                 Healthy = false,
             };
 
-            var res = await _client.ModifyInstanceHealthStatusAsync(request);
+            var res = await _namingClient.ModifyInstanceHealthStatusAsync(request);
             // 集群配置了健康检查时,该接口会返回错误
             Assert.False(res);
         }

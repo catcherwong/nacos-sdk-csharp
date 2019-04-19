@@ -3,15 +3,15 @@
     public abstract class BaseRequest
     {        
         /// <summary>
-        /// 将Request转成参数
+        /// Convert request to params of API
         /// </summary>
         /// <returns></returns>
         public abstract string ToQueryString();
 
         /// <summary>
-        /// 检验参数是否合法
+        /// Checks whether request is valid
         /// </summary>
         /// <returns></returns>
-        public abstract bool IsValid();
+        public abstract void CheckParam();
     }
 }
