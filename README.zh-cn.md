@@ -1,4 +1,4 @@
-# nacos-sdk-csharp 　　　　　　　　   　　[English](./README.md)
+# nacos-sdk-csharp 　　　　   　　　　   　　[English](./README.md)
 
 基于C#(dotnet core)实现 [nacos](https://nacos.io/) OpenAPI 的非官方版本
 
@@ -24,9 +24,14 @@ public class Startup
         // 配置
         services.AddNacos(configure =>
         {
+            // 默认超时时间
             configure.DefaultTimeOut = 8;
-            configure.EndPoint = "http://192.168.12.209:8848";
+            // nacos的地址
+            configure.EndPoint = "http://localhost:8848";
+            // 命名空间
             configure.Namespace = "";
+            // 监听的间隔时间
+            configure.ListenInterval = 1000;
         });   
 
         // 或着从配置文件中读取
@@ -42,7 +47,8 @@ public class Startup
     "nacos": {
         "EndPoint": "http://localhost:8848",
         "DefaultTimeOut": 15,
-        "Namespace": ""
+        "Namespace": "",
+        "ListenInterval": 1000
     }
 }
 ```
@@ -78,6 +84,27 @@ var removeConfigResult = await _client.RemoveConfigAsync(new RemoveConfigRequest
     //Tenant = "tenant"
 });
 
+// 监听配置
+await _configClient.AddListenerAsync(new AddListenerRequest
+{
+    DataId = "dataId",
+    //Group = "DEFAULT_GROUP",
+    //Tenant = "tenant",
+    Callbacks = new List<Action<string>>
+    {
+        x =>{ Console.WriteLine(x); },
+    }
+});
+
+// 删除监听
+await _configClient.RemoveListenerAsync(new RemoveListenerRequest
+{
+    DataId = "dataId",
+    Callbacks = new List<Action>
+    {
+        () =>{ Console.WriteLine("removed listener"); },
+    }
+});
 ```
 
 ### 服务发现

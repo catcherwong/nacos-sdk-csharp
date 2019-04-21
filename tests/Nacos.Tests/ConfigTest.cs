@@ -1,5 +1,7 @@
 ﻿namespace Nacos.Tests
 {
+    using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Xunit;
 
@@ -52,20 +54,31 @@
         [Fact]
         public async Task ListenerConfig_Should_Succeed()
         {
-            var request = new ListenerConfigRequest
+            var request = new AddListenerRequest
             {
                 DataId = "dataId",
                 //Group = "DEFAULT_GROUP",
-                //Tenant = "tenant"
+                //Tenant = "tenant",
+                Callbacks = new List<Action<string>>
+                {
+                    x =>{ Console.WriteLine(x); },
+                }
             };
 
-            await _configClient.ListenerConfigAsync(request);
+            await _configClient.AddListenerAsync(request);
 
             Assert.True(true);
 
-            await Task.Delay(50000);
+            await Task.Delay(1000);
 
-            
+            var rRequest = new RemoveListenerRequest
+            {
+                DataId = "dataId",
+            };
+
+            await _configClient.RemoveListenerAsync(rRequest);
+
+            await Task.Delay(50000);
         }
     }
 }

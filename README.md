@@ -1,4 +1,4 @@
-# nacos-sdk-csharp 　　　　　   　　　　　[中文](./README.zh-cn.md)
+# nacos-sdk-csharp 　　　　　   　　   　　　[中文](./README.zh-cn.md)
 
 Unofficial csharp(dotnet core) implementation of [nacos](https://nacos.io/) OpenAPI.
 
@@ -24,9 +24,14 @@ public class Startup
         // configuration
         services.AddNacos(configure =>
         {
+            // default timeout
             configure.DefaultTimeOut = 8;
-            configure.EndPoint = "http://192.168.12.209:8848";
+            // nacos's endpoint
+            configure.EndPoint = "http://localhost:8848";
+            // namespace
             configure.Namespace = "";
+            // listen interval
+            configure.ListenInterval = 1000;
         });   
 
         //// or read from configuration file
@@ -42,7 +47,8 @@ Sample of configuration file
     "nacos": {
         "EndPoint": "http://localhost:8848",
         "DefaultTimeOut": 15,
-        "Namespace": ""
+        "Namespace": "",
+        "ListenInterval": 1000,
     }
 }
 ```
@@ -78,6 +84,27 @@ var removeConfigResult = await _client.RemoveConfigAsync(new RemoveConfigRequest
     //Tenant = "tenant"
 });
 
+// Add listener
+await _configClient.AddListenerAsync(new AddListenerRequest
+{
+    DataId = "dataId",
+    //Group = "DEFAULT_GROUP",
+    //Tenant = "tenant",
+    Callbacks = new List<Action<string>>
+    {
+        x =>{ Console.WriteLine(x); },
+    }
+});
+
+// Remove listener
+await _configClient.RemoveListenerAsync(new RemoveListenerRequest
+{
+    DataId = "dataId",
+    Callbacks = new List<Action>
+    {
+        () =>{ Console.WriteLine("removed listener"); },
+    }
+});
 ```
 
 ### Service Discovery

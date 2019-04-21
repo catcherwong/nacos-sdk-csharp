@@ -1,7 +1,7 @@
 ﻿namespace Nacos
 {
     using System.Threading.Tasks;
- 
+
     public interface INacosConfigClient
     {
         /// <summary>
@@ -26,10 +26,17 @@
         Task<bool> RemoveConfigAsync(RemoveConfigRequest request);
 
         /// <summary>
-        /// Listens for configurations in Nacos 
-        /// </summary>        
-        /// <param name="request">request</param>
+        /// Listen configuration.
+        /// </summary>
+        /// <param name="request">request.</param>
         /// <returns></returns>
-        Task ListenerConfigAsync(ListenerConfigRequest request);
+        Task AddListenerAsync(AddListenerRequest request);
+
+        /// <summary>
+        /// Delete Listening
+        /// </summary>
+        /// <param name="request">request.</param>
+        /// <returns></returns>
+        Task RemoveListenerAsync(RemoveListenerRequest request);
     }
 }

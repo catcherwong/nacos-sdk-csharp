@@ -5,6 +5,8 @@
     using Nacos.Exceptions;
     using Nacos.Utilities;
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
@@ -15,6 +17,7 @@
         private readonly NacosOptions _options;
         private readonly IHttpClientFactory _clientFactory;
         private readonly ILocalConfigInfoProcessor _processor;
+        private readonly List<Listener> listeners;
 
         public NacosConfigClient(
             ILoggerFactory loggerFactory
@@ -26,6 +29,8 @@
             this._options = optionAccs.CurrentValue;
             this._clientFactory = clientFactory;
             this._processor = processor;
+
+            this.listeners = new List<Listener>();
         }
 
         public async Task<string> GetConfigAsync(GetConfigRequest request)
@@ -99,7 +104,7 @@
             request.Group = string.IsNullOrWhiteSpace(request.Group) ? ConstValue.DefaultGroup : request.Group;
 
             request.CheckParam();
-                        
+
             var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Post, $"{_options.EndPoint}/nacos/v1/cs/configs", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
@@ -125,7 +130,7 @@
             request.Group = string.IsNullOrWhiteSpace(request.Group) ? ConstValue.DefaultGroup : request.Group;
 
             request.CheckParam();
-                        
+
             var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Delete, $"{_options.EndPoint}/nacos/v1/cs/configs", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
@@ -143,79 +148,160 @@
             }
         }
 
-        public async Task ListenerConfigAsync(ListenerConfigRequest request)
+        public Task AddListenerAsync(AddListenerRequest request)
         {
             if (request == null) throw new NacosException(ConstValue.CLIENT_INVALID_PARAM, "request param invalid");
 
-            request.Tenant = string.IsNullOrWhiteSpace(request.Tenant) ? _options.Namespace : request.Tenant;
-            request.Group = string.IsNullOrWhiteSpace(request.Group) ? ConstValue.DefaultGroup : request.Group;
+            if (string.IsNullOrWhiteSpace(request.Tenant)) request.Tenant = _options.Namespace;
+            if (string.IsNullOrWhiteSpace(request.Group)) request.Group = ConstValue.DefaultGroup;
 
-            var config = string.Empty;
+            request.CheckParam();
 
-            do
+            var name = BuildName(request.Tenant, request.Group, request.DataId);
+
+            if (listeners.Any(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
             {
-                request.Content = config;
+                _logger.LogWarning($"[add-listener] error, {name} has been added.");
+                return Task.CompletedTask;
+            }
 
+            Timer timer = new Timer(async x =>
+            {
+                await PollingAsync(x);
+#if !DEBUG
+            }, request, 0, _options.ListenInterval);
+#else
+            }, request, 0, 8000);
+#endif
+
+            listeners.Add(new Listener(name, timer));
+
+            return Task.CompletedTask;
+        }
+
+        public Task RemoveListenerAsync(RemoveListenerRequest request)
+        {
+            if (request == null) throw new NacosException(ConstValue.CLIENT_INVALID_PARAM, "request param invalid");
+
+            if (string.IsNullOrWhiteSpace(request.Tenant)) request.Tenant = _options.Namespace;
+            if (string.IsNullOrWhiteSpace(request.Group)) request.Group = ConstValue.DefaultGroup;
+
+            request.CheckParam();
+
+            var name = BuildName(request.Tenant, request.Group, request.DataId);
+
+            if (!listeners.Any(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            {
+                _logger.LogWarning($"[remove-listener] error, {name} was not added.");
+                return Task.CompletedTask;
+            }
+
+            var list = listeners.Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            // clean timer
+            foreach (var item in list)
+            {
+                item.Timer.Dispose();
+                item.Timer = null;
+            }
+
+            // remove listeners
+            listeners.RemoveAll(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+            foreach (var cb in request.Callbacks)
+            {
                 try
                 {
-                    var client = _clientFactory.CreateClient(ConstValue.ClientName);
-                    // longer than long pulling timeout
-                    client.Timeout = TimeSpan.FromSeconds(ConstValue.LongPullingTimeout + 10);
-
-                    var stringContent = new StringContent(request.ToQueryString());
-                    stringContent.Headers.TryAddWithoutValidation("Long-Pulling-Timeout", (ConstValue.LongPullingTimeout * 1000).ToString());
-                    stringContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/x-www-form-urlencoded");
-
-                    var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{_options.EndPoint}/nacos/v1/cs/configs/listener")
-                    {
-                        Content = stringContent
-                    };
-
-                    var responseMessage = await client.SendAsync(requestMessage);
-
-                    switch (responseMessage.StatusCode)
-                    {
-                        case System.Net.HttpStatusCode.OK:
-                            var content = await responseMessage.Content.ReadAsStringAsync();
-                            config = await HandleContentAsync(content, request);
-                            break;
-                        case System.Net.HttpStatusCode.Forbidden:
-                            _logger.LogWarning($"[listener] error, dataId={request.DataId}, group={request.Group}, tenant={request.Tenant}, code={(int)responseMessage.StatusCode} msg={responseMessage.StatusCode.ToString()}");
-                            throw new NacosException(ConstValue.NO_RIGHT, $"Insufficient privilege.");
-                        default:
-                            _logger.LogWarning($"[listener] error, dataId={request.DataId}, group={request.Group}, tenant={request.Tenant}, code={(int)responseMessage.StatusCode} msg={responseMessage.StatusCode.ToString()}");
-                            throw new NacosException((int)responseMessage.StatusCode, responseMessage.StatusCode.ToString());
-                    }
+                    cb();
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"[listener] error, dataId={request.DataId}, group={request.Group}, tenant={request.Tenant}");
-                    Thread.Sleep(1000);
+                    _logger.LogError(ex, $"[remove-listener] call back throw exception, dataId={request.DataId}, group={request.Group}, tenant={request.Tenant}");
                 }
-            } while (true);
+            }
+
+            return Task.CompletedTask;
         }
 
-        private async Task<string> HandleContentAsync(string content, ListenerConfigRequest request)
+        private string BuildName(string tenant, string group, string dataId)
         {
-            string config;
+            return $"{tenant}-{group}-{dataId}";
+        }
 
+        private async Task PollingAsync(object requestInfo)
+        {
+            var request = (AddListenerRequest)requestInfo;
+
+            // read the last config
+            var lastConfig = await _processor.GetSnapshotAync(request.DataId, request.Group, request.Tenant);
+            request.Content = lastConfig;
+
+            try
+            {
+                var client = _clientFactory.CreateClient(ConstValue.ClientName);
+
+                // longer than long pulling timeout
+                client.Timeout = TimeSpan.FromSeconds(ConstValue.LongPullingTimeout + 10);
+
+                var stringContent = new StringContent(request.ToQueryString());
+                stringContent.Headers.TryAddWithoutValidation("Long-Pulling-Timeout", (ConstValue.LongPullingTimeout * 1000).ToString());
+                stringContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/x-www-form-urlencoded");
+
+                var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{_options.EndPoint}/nacos/v1/cs/configs/listener")
+                {
+                    Content = stringContent
+                };
+
+                var responseMessage = await client.SendAsync(requestMessage);
+
+                switch (responseMessage.StatusCode)
+                {
+                    case System.Net.HttpStatusCode.OK:
+                        var content = await responseMessage.Content.ReadAsStringAsync();
+                        await ConfigChangeAsync(content, request);                                              
+                        break;
+                    case System.Net.HttpStatusCode.Forbidden:
+                        _logger.LogWarning($"[listener] error, dataId={request.DataId}, group={request.Group}, tenant={request.Tenant}, code={(int)responseMessage.StatusCode} msg={responseMessage.StatusCode.ToString()}");
+                        throw new NacosException(ConstValue.NO_RIGHT, $"Insufficient privilege.");
+                    default:
+                        _logger.LogWarning($"[listener] error, dataId={request.DataId}, group={request.Group}, tenant={request.Tenant}, code={(int)responseMessage.StatusCode} msg={responseMessage.StatusCode.ToString()}");
+                        throw new NacosException((int)responseMessage.StatusCode, responseMessage.StatusCode.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[listener] error, dataId={request.DataId}, group={request.Group}, tenant={request.Tenant}");
+            }
+        }
+
+        private async Task ConfigChangeAsync(string content, AddListenerRequest request)
+        {
+            // config was changed
             if (!string.IsNullOrWhiteSpace(content))
             {
-                config = await DoGetConfigAsync(new GetConfigRequest
+                var config = await DoGetConfigAsync(new GetConfigRequest
                 {
                     DataId = request.DataId,
                     Group = request.Group,
                     Tenant = request.Tenant
                 });
 
+                // update local cache
                 await _processor.SaveSnapshotAsync(request.DataId, request.Group, request.Tenant, config);
-            }
-            else
-            {
-                config = await _processor.GetFailoverAsync(request.DataId, request.Group, request.Tenant);
-            }
 
-            return config;
-        }
+                // callback
+                foreach (var cb in request.Callbacks)
+                {
+                    try
+                    {
+                        cb(config);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"[listener] call back throw exception, dataId={request.DataId}, group={request.Group}, tenant={request.Tenant}");
+                    }
+                }
+            }
+        } 
     }
 }
