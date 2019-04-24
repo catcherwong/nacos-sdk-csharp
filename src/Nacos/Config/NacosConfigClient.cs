@@ -18,6 +18,7 @@
         private readonly IHttpClientFactory _clientFactory;
         private readonly ILocalConfigInfoProcessor _processor;
         private readonly List<Listener> listeners;
+        private readonly ServerAddressManager _serverAddressManager;
 
         public NacosConfigClient(
             ILoggerFactory loggerFactory
@@ -31,6 +32,7 @@
             this._processor = processor;
 
             this.listeners = new List<Listener>();
+            this._serverAddressManager = new ServerAddressManager(_options);
         }
 
         public async Task<string> GetConfigAsync(GetConfigRequest request)
@@ -79,7 +81,7 @@
 
         private async Task<string> DoGetConfigAsync(GetConfigRequest request)
         {
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/cs/configs", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{GetBaseUrl()}/nacos/v1/cs/configs", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -105,7 +107,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Post, $"{_options.EndPoint}/nacos/v1/cs/configs", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Post, $"{GetBaseUrl()}/nacos/v1/cs/configs", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -131,7 +133,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Delete, $"{_options.EndPoint}/nacos/v1/cs/configs", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Delete, $"{GetBaseUrl()}/nacos/v1/cs/configs", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -247,7 +249,7 @@
                 stringContent.Headers.TryAddWithoutValidation("Long-Pulling-Timeout", (ConstValue.LongPullingTimeout * 1000).ToString());
                 stringContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/x-www-form-urlencoded");
 
-                var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{_options.EndPoint}/nacos/v1/cs/configs/listener")
+                var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{GetBaseUrl()}/nacos/v1/cs/configs/listener")
                 {
                     Content = stringContent
                 };
@@ -258,7 +260,7 @@
                 {
                     case System.Net.HttpStatusCode.OK:
                         var content = await responseMessage.Content.ReadAsStringAsync();
-                        await ConfigChangeAsync(content, request);                                              
+                        await ConfigChangeAsync(content, request);
                         break;
                     case System.Net.HttpStatusCode.Forbidden:
                         _logger.LogWarning($"[listener] error, dataId={request.DataId}, group={request.Group}, tenant={request.Tenant}, code={(int)responseMessage.StatusCode} msg={responseMessage.StatusCode.ToString()}");
@@ -302,6 +304,12 @@
                     }
                 }
             }
-        } 
+        }
+
+        private string GetBaseUrl()
+        {
+            var hostAndPort = _serverAddressManager.GetCurrentServer();
+            return $"http://{hostAndPort}";
+        }
     }
 }

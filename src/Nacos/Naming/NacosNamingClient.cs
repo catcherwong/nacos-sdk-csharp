@@ -13,6 +13,7 @@
         private readonly ILogger _logger;
         private readonly NacosOptions _options;
         private readonly IHttpClientFactory _clientFactory;
+        private readonly ServerAddressManager _serverAddressManager;
 
         public NacosNamingClient(
             ILoggerFactory loggerFactory
@@ -22,6 +23,8 @@
             this._logger = loggerFactory.CreateLogger<NacosNamingClient>();
             this._options = optionAccs.CurrentValue;
             this._clientFactory = clientFactory;
+
+            this._serverAddressManager = new ServerAddressManager(_options);
         }
 
         #region Instance
@@ -31,7 +34,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Post, $"{_options.EndPoint}/nacos/v1/ns/instance", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Post, $"{GetBaseUrl()}/nacos/v1/ns/instance", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -58,7 +61,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Delete, $"{_options.EndPoint}/nacos/v1/ns/instance", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Delete, $"{GetBaseUrl()}/nacos/v1/ns/instance", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -85,7 +88,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Put, $"{_options.EndPoint}/nacos/v1/ns/instance", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Put, $"{GetBaseUrl()}/nacos/v1/ns/instance", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -112,7 +115,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/ns/instance/list", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{GetBaseUrl()}/nacos/v1/ns/instance/list", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -132,7 +135,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/ns/instance", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{GetBaseUrl()}/nacos/v1/ns/instance", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -152,7 +155,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Put, $"{_options.EndPoint}/nacos/v1/ns/instance/beat", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Put, $"{GetBaseUrl()}/nacos/v1/ns/instance/beat", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -179,7 +182,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Put, $"{_options.EndPoint}/nacos/v1/ns/health/instance", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Put, $"{GetBaseUrl()}/nacos/v1/ns/health/instance", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -207,7 +210,7 @@
         #region Metrics
         public async Task<GetMetricsResult> GetMetricsAsync()
         {
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/ns/operator/metrics", timeOut: _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{GetBaseUrl()}/nacos/v1/ns/operator/metrics", timeOut: _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -229,7 +232,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Post, $"{_options.EndPoint}/nacos/v1/ns/service", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Post, $"{GetBaseUrl()}/nacos/v1/ns/service", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -256,7 +259,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Delete, $"{_options.EndPoint}/nacos/v1/ns/service", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Delete, $"{GetBaseUrl()}/nacos/v1/ns/service", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -283,7 +286,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Put, $"{_options.EndPoint}/nacos/v1/ns/service", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Put, $"{GetBaseUrl()}/nacos/v1/ns/service", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -310,7 +313,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/ns/service", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{GetBaseUrl()}/nacos/v1/ns/service", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -330,7 +333,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/ns/service/list", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{GetBaseUrl()}/nacos/v1/ns/service/list", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -348,7 +351,7 @@
         #region Switches
         public async Task<GetSwitchesResult> GetSwitchesAsync()
         {
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/ns/operator/switches", timeOut: _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{GetBaseUrl()}/nacos/v1/ns/operator/switches", timeOut: _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -368,7 +371,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Put, $"{_options.EndPoint}/nacos/v1/ns/operator/switches", request.ToQueryString());
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Put, $"{GetBaseUrl()}/nacos/v1/ns/operator/switches", request.ToQueryString());
 
             switch (responseMessage.StatusCode)
             {
@@ -398,7 +401,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/ns/operator/servers", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{GetBaseUrl()}/nacos/v1/ns/operator/servers", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -414,7 +417,7 @@
 
         public async Task<GetCurrentClusterLeaderResult> GetCurrentClusterLeaderAsync()
         {
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{_options.EndPoint}/nacos/v1/ns/raft/leader");
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{GetBaseUrl()}/nacos/v1/ns/raft/leader");
 
             switch (responseMessage.StatusCode)
             {
@@ -429,5 +432,11 @@
             }
         }
         #endregion
+
+        private string GetBaseUrl()
+        {
+            var hostAndPort = _serverAddressManager.GetCurrentServer();
+            return $"http://{hostAndPort}";
+        }
     }
 }

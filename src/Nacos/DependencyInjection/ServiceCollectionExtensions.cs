@@ -20,7 +20,7 @@
 
             services.AddHttpClient(ConstValue.ClientName)
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler() { UseProxy = false });
-
+                
             services.TryAddSingleton<ILocalConfigInfoProcessor, MemoryLocalConfigInfoProcessor>();
             services.AddSingleton<INacosConfigClient, NacosConfigClient>();
             services.AddSingleton<INacosNamingClient, NacosNamingClient>();
@@ -39,7 +39,7 @@
 
             services.AddHttpClient(ConstValue.ClientName)
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler() { UseProxy = false });
-
+                
             services.TryAddSingleton<ILocalConfigInfoProcessor, MemoryLocalConfigInfoProcessor>();
             services.AddSingleton<INacosConfigClient, NacosConfigClient>();
             services.AddSingleton<INacosNamingClient, NacosNamingClient>();
@@ -60,7 +60,7 @@
             services.AddHttpClient(ConstValue.ClientName)
                 .ConfigureHttpClient(httpClientAction)
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler() { UseProxy = false });
-
+                
             services.TryAddSingleton<ILocalConfigInfoProcessor, MemoryLocalConfigInfoProcessor>();
             services.AddSingleton<INacosConfigClient, NacosConfigClient>();
             services.AddSingleton<INacosNamingClient, NacosNamingClient>();
