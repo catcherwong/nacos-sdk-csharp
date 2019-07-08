@@ -34,9 +34,7 @@
             {             
                 sb.Append($"&namespaceId={NamespaceId}");
             }
-         
-        
-
+                 
             if (!string.IsNullOrWhiteSpace(GroupName))
             {
                 sb.Append($"&groupName={GroupName}");

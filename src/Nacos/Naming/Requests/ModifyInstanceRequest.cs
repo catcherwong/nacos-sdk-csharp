@@ -50,6 +50,12 @@
         /// </summary>
         public bool? Ephemeral { get; set; }
 
+        /// <summary>
+        /// If enabled
+        /// </summary>
+        /// <value>The enabled.</value>
+        public bool? Enabled { get; set; }
+
         public override void CheckParam()
         {
             ParamUtil.CheckInstanceInfo(Ip, Port, ServiceName);            
@@ -88,7 +94,12 @@
             if (Ephemeral.HasValue)
             {
                 sb.Append($"&ephemeral={Ephemeral}");
-            }      
+            }    
+
+            if(Enabled.HasValue)
+            {
+                sb.Append($"&enabled={Enabled.Value}");
+            }  
 
             return sb.ToString();
         }

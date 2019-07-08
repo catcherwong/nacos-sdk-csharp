@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>nacos-sdk-csharp-unofficial</PackageId>
-    <PackageVersion>0.1.1</PackageVersion>
+    <PackageVersion>0.1.2</PackageVersion>
     <Authors>Catcher Wong</Authors>
     <Owners>Catcher Wong</Owners>
     <Description>nacos csharp sdk (unofficial)</Description>      
@@ -12,10 +12,9 @@
     <RepositoryUrl>https://github.com/catcherwong/nacos-sdk-csharp</RepositoryUrl>
     <ProjectUrl>https://github.com/catcherwong/nacos-sdk-csharp</ProjectUrl>    
     <PackageReleaseNotes>
-     1. Spereate config client and naming client.
-     2. Add some logs.
-     3. Check request param with NacosException.
-     4. config client add AddListenerAsync and RemoveListenerAsync.
+     1. Upgrading dependencies.
+     2. Add configuration type for PublishConfigRequest.
+     3. Add enabled for ModifyInstanceRequest.
     </PackageReleaseNotes>    
   </PropertyGroup>
 

@@ -25,6 +25,11 @@
         /// </summary>
         public string Content { get; set; }
 
+        /// <summary>
+        /// Configuration type
+        /// </summary>
+        public string Type { get; set; }
+
         public override void CheckParam()
         {
             ParamUtil.CheckParam(DataId, Group, Content);            
@@ -38,7 +43,12 @@
             if (!string.IsNullOrWhiteSpace(Tenant))
             {             
                 sb.Append($"&tenant={Tenant}");
-            }                     
+            }      
+
+            if(!string.IsNullOrWhiteSpace(Type))
+            {
+                sb.Append($"&type={Type}");
+            }
 
             return sb.ToString();
         }

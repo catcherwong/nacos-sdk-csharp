@@ -81,7 +81,7 @@
 
         private async Task<string> DoGetConfigAsync(GetConfigRequest request)
         {
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{GetBaseUrl()}/nacos/v1/cs/configs", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -107,7 +107,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Post, $"{GetBaseUrl()}/nacos/v1/cs/configs", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Post, $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -133,7 +133,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Delete, $"{GetBaseUrl()}/nacos/v1/cs/configs", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Delete, $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", request.ToQueryString(), _options.DefaultTimeOut);
 
             switch (responseMessage.StatusCode)
             {
@@ -249,7 +249,7 @@
                 stringContent.Headers.TryAddWithoutValidation("Long-Pulling-Timeout", (ConstValue.LongPullingTimeout * 1000).ToString());
                 stringContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/x-www-form-urlencoded");
 
-                var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{GetBaseUrl()}/nacos/v1/cs/configs/listener")
+                var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{GetBaseUrl()}{RequestPathValue.CONFIGS_LISTENER}")
                 {
                     Content = stringContent
                 };
