@@ -81,9 +81,9 @@
                 ServiceName = "testservice",
                 BeatInfo = new BeatInfo
                 {
-                    ServiceName = "testservice",
-                    Ip = "192.168.0.74",
-                    Port = 9999,                     
+                    serviceName = "testservice",
+                    ip = "192.168.0.74",
+                    port = 9999,                     
                 }
             };
 

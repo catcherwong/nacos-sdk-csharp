@@ -1,11 +1,22 @@
 ﻿namespace Nacos.AspNetCore
 {
+    using System.Collections.Generic;
+
     public class NacosAspNetCoreOptions
     {
         /// <summary>
         /// nacos server endpoint
         /// </summary>
+        [System.Obsolete("replace with ServerAddresses")]
         public string EndPoint { get; set; } = "http://localhost:8848";
+
+        /// <summary>
+        /// nacos server addresses.
+        /// </summary>
+        /// <example>
+        /// 10.1.12.123:8848,10.1.12.124:8848
+        /// </example>
+        public List<string> ServerAddresses { get; set; }
 
         /// <summary>
         /// default timeout, unit is second.
@@ -32,5 +43,10 @@
         /// the name of the group.
         /// </summary>
         public string GroupName { get; set; }
+
+        /// <summary>
+        /// the weight of this instance.
+        /// </summary>
+        public double Weight { get; set; } = 10;
     }
 }

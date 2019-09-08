@@ -4,12 +4,12 @@
 
     public class BeatInfo
     {
-        public int Port { get; set; }
-        public string Ip { get; set; }
-        public double Weight { get; set; }
-        public string ServiceName { get; set; }
-        public string Cluster { get; set; }     
-        public Dictionary<string,string> Metadata { get; set; }
-        public bool Scheduled { get; set; }
+        public int port { get; set; }
+        public string ip { get; set; }
+        public double weight { get; set; }
+        public string serviceName { get; set; }
+        public string cluster { get; set; }
+        public Dictionary<string, string> metadata { get; set; } = new Dictionary<string, string>();
+        public bool scheduled { get; set; }
     }
 }
