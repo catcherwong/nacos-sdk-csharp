@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/catcherwong/nacos-sdk-csharp</RepositoryUrl>
     <ProjectUrl>https://github.com/catcherwong/nacos-sdk-csharp</ProjectUrl>    
     <PackageReleaseNotes>
-     1. Upgrading dependencies.
+     1. bug fixed.
     </PackageReleaseNotes>    
   </PropertyGroup>
 

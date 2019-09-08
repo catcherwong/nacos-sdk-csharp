@@ -1,5 +1,7 @@
 ﻿namespace Nacos
 {
+    using System.Collections.Generic;
+
     public class NacosOptions
     {
         /// <summary>
@@ -14,8 +16,8 @@
         /// <example>
         /// 10.1.12.123:8848,10.1.12.124:8848
         /// </example>
-        public string ServerAddresses { get; set; } = "";
-        
+        public List<string> ServerAddresses { get; set; }
+
         /// <summary>
         /// default timeout, unit is second.
         /// </summary>

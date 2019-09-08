@@ -2,8 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
-    public class ServerAddressManager 
+    public class ServerAddressManager
     {
         private string _server;
 
@@ -15,11 +16,9 @@
         {
             var serverAddresses = options.ServerAddresses;
 
-            if (string.IsNullOrWhiteSpace(serverAddresses)) throw new ArgumentNullException();
+            if (serverAddresses == null || !serverAddresses.Any()) throw new ArgumentNullException(" ServerAddresses can not be null or empty ");
 
-            var hostAndPorts = serverAddresses.Split(',');
-
-            foreach (var item in hostAndPorts)
+            foreach (var item in serverAddresses)
             {
                 var hostAndPort = string.Empty;
 
@@ -35,7 +34,7 @@
                 }
                 else
                 {
-                    throw new ArgumentException();
+                    throw new ArgumentException(" incorrect server address, it should be [ip:port] ");
                 }
 
                 _servers.Add(hostAndPort);
@@ -54,7 +53,7 @@
 
         public string GetCurrentServer()
         {
-            return _server;                 
+            return _server;
         }
     }
 }
