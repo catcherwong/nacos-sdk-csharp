@@ -4,6 +4,8 @@
 
 ![](https://img.shields.io/nuget/v/nacos-sdk-csharp-unofficial.svg)
 
+![](./media/prj.png)
+
 ## 安装Nuget包
 
 ```bash
