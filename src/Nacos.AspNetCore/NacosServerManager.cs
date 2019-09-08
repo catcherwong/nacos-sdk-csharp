@@ -40,7 +40,7 @@
                 }
 
                 return null;
-            }, TimeSpan.FromMinutes(1));
+            }, TimeSpan.FromSeconds(10));
 
             if (cached.HasValue)
             {
