@@ -30,7 +30,9 @@
                 DataId = "dataId",
                 Group = "DEFAULT_GROUP",
                 //Tenant = "tenant",
-                Content = "test"
+                Content = "test",                
+                Type = "text",
+                AppName = "appdemo"
             };
 
             var res = await _configClient.PublishConfigAsync(request);

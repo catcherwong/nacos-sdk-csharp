@@ -26,9 +26,19 @@
         public string Content { get; set; }
 
         /// <summary>
-        /// Configuration type
+        /// Configuration type, options value text, json, xml, yaml, html, properties
         /// </summary>
         public string Type { get; set; }
+
+        /// <summary>
+        /// Configuration application
+        /// </summary>
+        public string AppName { get; set; }
+
+        /// <summary>
+        /// Configuration tags
+        /// </summary>
+        public string Tag { get; set; }
 
         public override void CheckParam()
         {
@@ -48,6 +58,16 @@
             if(!string.IsNullOrWhiteSpace(Type))
             {
                 sb.Append($"&type={Type}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(AppName))
+            {
+                sb.Append($"&appName={AppName}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(Tag))
+            {
+                sb.Append($"&tag={Tag}");
             }
 
             return sb.ToString();
