@@ -28,8 +28,8 @@ public class Startup
         {
             // 默认超时时间
             configure.DefaultTimeOut = 8;
-            // nacos的地址
-            configure.EndPoint = "http://localhost:8848";
+            // nacos的地址            
+            configure.ServerAddresses = new List<string> { "localhost:8848", };
             // 命名空间
             configure.Namespace = "";
             // 监听的间隔时间
@@ -47,7 +47,7 @@ public class Startup
 ```JSON
 {
     "nacos": {
-        "EndPoint": "http://localhost:8848",
+        "ServerAddresses": [ "localhost:8848" ],
         "DefaultTimeOut": 15,
         "Namespace": "",
         "ListenInterval": 1000

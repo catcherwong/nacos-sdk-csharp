@@ -28,9 +28,8 @@ public class Startup
         {
             // default timeout
             configure.DefaultTimeOut = 8;
-            // nacos's endpoint
-            // configure.EndPoint = "http://localhost:8848";
-            configure.ServerAddresses = new System.Collections.Generic.List<string> { "localhost:8848", };
+            // nacos's server addresses
+            configure.ServerAddresses = new List<string> { "localhost:8848", };
             // namespace
             configure.Namespace = "";
             // listen interval
@@ -48,7 +47,7 @@ Sample of configuration file
 ```JSON
 {
     "nacos": {        
-        "ServerAddresses" : [ "localhost:8848" ]
+        "ServerAddresses": [ "localhost:8848" ],
         "DefaultTimeOut": 15,
         "Namespace": "",
         "ListenInterval": 1000,
