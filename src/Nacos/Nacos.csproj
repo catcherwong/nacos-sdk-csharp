@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
     <PackageId>nacos-sdk-csharp-unofficial</PackageId>
-    <PackageVersion>0.1.5</PackageVersion>
+    <PackageVersion>0.1.6</PackageVersion>
     <Authors>Catcher Wong</Authors>
     <Owners>Catcher Wong</Owners>
     <Description>nacos csharp sdk (unofficial)</Description>      
@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/catcherwong/nacos-sdk-csharp</RepositoryUrl>
     <ProjectUrl>https://github.com/catcherwong/nacos-sdk-csharp</ProjectUrl>    
     <PackageReleaseNotes>
-     1. bug fixed.
+     1. Support netcore3.0     
     </PackageReleaseNotes>    
   </PropertyGroup>
 
@@ -20,10 +20,16 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
-  
-  <ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />    
+    <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0-rc1.19456.10" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="3.0.0-rc1.19456.10" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
   

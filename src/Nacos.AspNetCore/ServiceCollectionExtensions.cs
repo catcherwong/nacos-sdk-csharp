@@ -1,13 +1,17 @@
-﻿namespace Nacos.AspNetCore
+﻿namespace Microsoft.AspNetCore.Builder
 {
     using EasyCaching.Core;
     using EasyCaching.InMemory;
-    using Microsoft.AspNetCore.Builder;
+    using Nacos;
+    using Nacos.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Hosting.Server.Features;
     using Microsoft.AspNetCore.Http.Features;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+#if NETCORE3
+    using Microsoft.Extensions.Hosting;
+#endif
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using System;
@@ -38,7 +42,6 @@
             var namingClient = app.ApplicationServices.GetRequiredService<INacosNamingClient>();
             var nacosAspNetCoreConfig = app.ApplicationServices.GetRequiredService<IOptions<NacosAspNetCoreOptions>>();
             var logger = app.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger("Nacos.AspNetCore");
-            var lifetime = app.ApplicationServices.GetRequiredService<IApplicationLifetime>();
 
             if (!(app.Properties["server.Features"] is FeatureCollection features)) return app;
 
@@ -47,23 +50,14 @@
 
             var uri = new Uri(address);
 
-            //var registrerRequest = new RegisterInstanceRequest
-            //{
-            //    ServiceName = nacosAspNetCoreConfig.Value.ServiceName,
-            //    Ip = uri.Host,
-            //    Port = uri.Port,
-            //    GroupName = nacosAspNetCoreConfig.Value.GroupName,
-            //    NamespaceId = nacosAspNetCoreConfig.Value.Namespace,
-            //    ClusterName = nacosAspNetCoreConfig.Value.ClusterName,
-            //    Enable = true,
-            //    Ephemeral = false,
-            //};
-
             var timer = new Timer(async x =>
             {
                 await SendAsync(namingClient, nacosAspNetCoreConfig.Value, uri, logger);
             }, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
 
+#if !NETCORE3
+            var lifetime = app.ApplicationServices.GetRequiredService<IApplicationLifetime>();
+           
             lifetime.ApplicationStopping.Register(() =>
             {
                 logger.LogInformation("Unregistering from Nacos");
@@ -80,8 +74,34 @@
                 };
 
                 namingClient.RemoveInstanceAsync(removeRequest).ConfigureAwait(true);
-            });
 
+                timer.Change(Timeout.Infinite, 0);
+                timer.Dispose();
+            });
+#else
+            var lifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
+           
+            lifetime.ApplicationStopping.Register(() =>
+            {
+                logger.LogInformation("Unregistering from Nacos");
+
+                var removeRequest = new RemoveInstanceRequest
+                {
+                    ServiceName = nacosAspNetCoreConfig.Value.ServiceName,
+                    Ip = uri.Host,
+                    Port = uri.Port,
+                    GroupName = nacosAspNetCoreConfig.Value.GroupName,
+                    NamespaceId = nacosAspNetCoreConfig.Value.Namespace,
+                    ClusterName = nacosAspNetCoreConfig.Value.ClusterName,
+                    Ephemeral = false
+                };
+
+                namingClient.RemoveInstanceAsync(removeRequest).ConfigureAwait(true);
+
+                timer.Change(Timeout.Infinite, 0);
+                timer.Dispose();
+            });
+#endif
             return app;
         }
 

@@ -1,8 +1,8 @@
-﻿namespace Nacos
+﻿namespace Microsoft.Extensions.DependencyInjection
 {
     using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
+    using Nacos;
     using System;
     using System.Net.Http;
 
