@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.0.0-rc1.19456.10" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.0.0" />
     <PackageReference Include="EasyCaching.InMemory" Version="0.6.1" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>

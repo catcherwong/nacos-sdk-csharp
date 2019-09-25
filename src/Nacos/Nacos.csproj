@@ -28,8 +28,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0-rc1.19456.10" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="3.0.0-rc1.19456.10" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="3.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
   
