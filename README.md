@@ -6,6 +6,12 @@ Unofficial csharp(dotnet core) implementation of [nacos](https://nacos.io/) Open
 
 ![](./media/prj.png)
 
+## CI Build Status
+
+| Platform | Build Server | Master Status  |
+|--------- |------------- |---------|
+| Travis   | Linux/OSX | [![Build Status](https://travis-ci.com/catcherwong/nacos-sdk-csharp.svg?branch=master)](https://travis-ci.com/catcherwong/nacos-sdk-csharp) |
+
 ## Installation
 
 ```bash

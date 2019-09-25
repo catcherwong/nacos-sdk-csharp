@@ -6,6 +6,12 @@
 
 ![](./media/prj.png)
 
+## CI构建状态
+
+| Platform | Build Server | Master Status  |
+|--------- |------------- |---------|
+| Travis   | Linux/OSX | [![Build Status](https://travis-ci.com/catcherwong/nacos-sdk-csharp.svg?branch=master)](https://travis-ci.com/catcherwong/nacos-sdk-csharp) |
+
 ## 安装Nuget包
 
 ```bash
