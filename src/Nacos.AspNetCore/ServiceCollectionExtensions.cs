@@ -126,6 +126,7 @@
                         weight = options.Weight,
                         cluster = options.ClusterName,
                     },
+                     NameSpaceId = options.Namespace
                 });
             }
             catch (Exception ex)

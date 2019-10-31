@@ -30,6 +30,11 @@
         /// </summary>
         public bool? Ephemeral { get; set; }
 
+        /// <summary>
+        /// namespace id
+        /// </summary>
+        public string NameSpaceId { get; set; }
+
         public override void CheckParam()
         {
             //return BeatInfo != null && !string.IsNullOrWhiteSpace(ServiceName);
@@ -44,7 +49,12 @@
             {
                 sb.Append($"&groupName={GroupName}");
             }
-        
+
+            if (!string.IsNullOrWhiteSpace(NameSpaceId))
+            {
+                sb.Append($"&namespaceId={NameSpaceId}");
+            }
+
             if (Ephemeral.HasValue)
             {
                 sb.Append($"&ephemeral={Ephemeral.Value}");
