@@ -19,6 +19,7 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Net;
 
     public static class ServiceCollectionExtensions
     {
@@ -43,13 +44,8 @@
             var namingClient = app.ApplicationServices.GetRequiredService<INacosNamingClient>();
             var nacosAspNetCoreConfig = app.ApplicationServices.GetRequiredService<IOptions<NacosAspNetCoreOptions>>();
             var logger = app.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger("Nacos.AspNetCore");
-
-            if (!(app.Properties["server.Features"] is FeatureCollection features)) return app;
-
-            var addresses = features.Get<IServerAddressesFeature>();
-            var address = addresses.Addresses.First();
-
-            var uri = new Uri(address);
+          
+            var uri = GetUri(app, nacosAspNetCoreConfig.Value);
 
             var timer = new Timer(async x =>
             {
@@ -133,6 +129,71 @@
             {
                 logger.LogWarning(ex, "Send heart beat to Nacos error");
             }
+        }
+
+        private static Uri GetUri(IApplicationBuilder app, NacosAspNetCoreOptions config)
+        {
+            Uri uri = null;
+
+            var port = config.Port <= 0 ? 80 : config.Port;
+
+            // config first
+            if (!string.IsNullOrWhiteSpace(config.Ip))
+            {
+                return new Uri($"http://{config.Ip}:{port}");
+            }
+
+            var address = string.Empty;
+
+            // IServerAddressesFeature second
+            if (app.Properties["server.Features"] is FeatureCollection features)
+            {
+                var addresses = features.Get<IServerAddressesFeature>();
+                address = addresses.Addresses.First();
+
+                if (address != null)
+                {
+                    if (address.Contains("*"))
+                    {
+                        var ip = GetCurrentIp();
+
+                        address = address.Replace("*", ip);
+                    }
+                  
+                    uri = new Uri(address);
+                    return uri;
+                }               
+            }
+
+            // current ip address third        
+            address = $"http://{GetCurrentIp()}:{port}";
+
+            uri = new Uri(address);
+            return uri;
+        }
+
+        private static string GetCurrentIp()
+        {
+            var instanceIp = "127.0.0.1";
+
+            try
+            {
+                IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
+
+                foreach (var ipAddr in Dns.GetHostAddresses(Dns.GetHostName()))
+                {
+                    if (ipAddr.AddressFamily.ToString() == "InterNetwork")
+                    {
+                        instanceIp = ipAddr.ToString();
+                        break;
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return instanceIp;
         }
     }
 }

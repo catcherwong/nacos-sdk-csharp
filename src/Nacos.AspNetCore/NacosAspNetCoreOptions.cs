@@ -48,5 +48,15 @@
         /// the weight of this instance.
         /// </summary>
         public double Weight { get; set; } = 10;
+
+        /// <summary>
+        /// the ip of this instance
+        /// </summary>
+        public string Ip { get; set; }
+
+        /// <summary>
+        /// the port of this instace
+        /// </summary>
+        public int Port { get; set; }
     }
 }
