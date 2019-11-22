@@ -8,6 +8,16 @@
         public const string ClientName = "NacosClient";
 
         /// <summary>
+        /// nacos csharp client version
+        /// </summary>
+        public const string ClientVersion = "Nacos-CSharp-Client-v0.2.2";
+
+        /// <summary>
+        /// nacos request module
+        /// </summary>
+        public const string RequestModule = "Naming";
+
+        /// <summary>
         /// default group 
         /// </summary>
         public const string DefaultGroup = "DEFAULT_GROUP";

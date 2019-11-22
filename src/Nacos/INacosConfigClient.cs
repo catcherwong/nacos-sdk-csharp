@@ -38,5 +38,13 @@
         /// <param name="request">request.</param>
         /// <returns></returns>
         Task RemoveListenerAsync(RemoveListenerRequest request);
+
+        //Task<string> getConfigAndSignListener();
+
+        /// <summary>
+        /// Get server status
+        /// </summary>
+        /// <returns></returns>
+        Task<string> GetServerStatus();
     }
 }

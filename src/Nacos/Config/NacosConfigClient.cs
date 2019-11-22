@@ -19,6 +19,7 @@
         private readonly ILocalConfigInfoProcessor _processor;
         private readonly List<Listener> listeners;
         private readonly ServerAddressManager _serverAddressManager;
+        private bool isHealthServer = true;
 
         public NacosConfigClient(
             ILoggerFactory loggerFactory
@@ -259,19 +260,23 @@
                 switch (responseMessage.StatusCode)
                 {
                     case System.Net.HttpStatusCode.OK:
+                        SetHealthServer(true);
                         var content = await responseMessage.Content.ReadAsStringAsync();
                         await ConfigChangeAsync(content, request);
                         break;
                     case System.Net.HttpStatusCode.Forbidden:
+                        SetHealthServer(false);
                         _logger.LogWarning($"[listener] error, dataId={request.DataId}, group={request.Group}, tenant={request.Tenant}, code={(int)responseMessage.StatusCode} msg={responseMessage.StatusCode.ToString()}");
                         throw new NacosException(ConstValue.NO_RIGHT, $"Insufficient privilege.");
                     default:
+                        SetHealthServer(false);
                         _logger.LogWarning($"[listener] error, dataId={request.DataId}, group={request.Group}, tenant={request.Tenant}, code={(int)responseMessage.StatusCode} msg={responseMessage.StatusCode.ToString()}");
                         throw new NacosException((int)responseMessage.StatusCode, responseMessage.StatusCode.ToString());
                 }
             }
             catch (Exception ex)
             {
+                SetHealthServer(false);
                 _logger.LogError(ex, $"[listener] error, dataId={request.DataId}, group={request.Group}, tenant={request.Tenant}");
             }
         }
@@ -306,10 +311,20 @@
             }
         }
 
+        private void SetHealthServer(bool flag)
+        {
+            isHealthServer = flag;
+        }
+
         private string GetBaseUrl()
         {
             var hostAndPort = _serverAddressManager.GetCurrentServer();
             return $"http://{hostAndPort}";
+        }
+
+        public Task<string> GetServerStatus()
+        {
+            return Task.FromResult(isHealthServer ? "UP" : "DOWN");
         }
     }
 }
