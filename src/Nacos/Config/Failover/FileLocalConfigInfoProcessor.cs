@@ -1,13 +1,13 @@
 ﻿namespace Nacos
 {
     using System.IO;
+    using System.Text;
     using System.Threading.Tasks;
 
     public class FileLocalConfigInfoProcessor : ILocalConfigInfoProcessor
     {
         private readonly string FAILOVER_BASE = Path.Combine(Directory.GetCurrentDirectory(), "nacos-data", "data");
         private readonly string SNAPSHOT_BASE = Path.Combine(Directory.GetCurrentDirectory(), "nacos-data", "snapshot");
-
 
         public async Task<string> GetFailoverAsync(string dataId, string group, string tenant)
         {
@@ -27,9 +27,14 @@
                 return null;
             }
 
-            var config = File.ReadAllText(file.FullName);
-
-            return await Task.FromResult(config);
+            using (FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                byte[] readByte = new byte[fs.Length];
+                await fs.ReadAsync(readByte, 0, readByte.Length);
+                string readStr = Encoding.UTF8.GetString(readByte);
+                fs.Close();
+                return readStr;
+            }
         }
 
         public async Task<string> GetSnapshotAync(string dataId, string group, string tenant)
@@ -41,9 +46,14 @@
                 return null;
             }
 
-            var config = File.ReadAllText(file.FullName);
-
-            return await Task.FromResult(config);
+            using (FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                byte[] readByte = new byte[fs.Length];
+                await fs.ReadAsync(readByte, 0, readByte.Length);
+                string readStr = Encoding.UTF8.GetString(readByte);
+                fs.Close();
+                return readStr;
+            }
         }
 
         private FileInfo GetSnapshotFile(string dataId, string group, string tenant)
@@ -78,10 +88,13 @@
                     snapshotFile.Directory.Create();
                 }
 
-                File.WriteAllText(snapshotFile.FullName, config);
+                using (FileStream fs = new FileStream(snapshotFile.FullName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite))
+                {
+                    byte[] bytes = Encoding.UTF8.GetBytes(config);
+                    await fs.WriteAsync(bytes, 0, bytes.Length);
+                    fs.Close();
+                }
             }
-
-            await Task.Yield();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace Nacos.Microsoft.Extensions.Configuration
 {
     using global::Microsoft.Extensions.Configuration;
+    using global::Microsoft.Extensions.Logging.Abstractions;
     using System;
 
     internal class NacosConfigurationProvider : ConfigurationProvider
@@ -9,13 +10,22 @@
 
         private readonly INacosConfigurationParser _parser;
 
+        private readonly INacosConfigClient _client;
+
         public NacosConfigurationProvider(NacosConfigurationSource configurationSource)
         {
             _configurationSource = configurationSource;
 
-            _parser = configurationSource.NacosConfigurationParser ?? new JsonConfigurationParser();
+            _parser = configurationSource.NacosConfigurationParser ?? JsonConfigurationStringParser.Instance;
 
-            _configurationSource.NacosConfigClient.AddListenerAsync(new AddListenerRequest
+            _client = new NacosMsConfigClient(NullLoggerFactory.Instance, new NacosOptions
+            {
+                ServerAddresses = configurationSource.ServerAddresses,
+                Namespace = configurationSource.Tenant,
+                ListenInterval = 5000
+            });
+
+            _client.AddListenerAsync(new AddListenerRequest
             {
                 DataId = _configurationSource.DataId,
                 Group = _configurationSource.Group,
@@ -24,7 +34,7 @@
                 {
                     x => CallBackReload(x)
                 }
-            }) ;
+            });
         }
 
         private void CallBackReload(string val)
@@ -50,7 +60,7 @@
         {
             try
             {
-                var config = _configurationSource.NacosConfigClient.GetConfigAsync(new GetConfigRequest 
+                var config = _client.GetConfigAsync(new GetConfigRequest
                 {
                     DataId = _configurationSource.DataId,
                     Group = _configurationSource.Group,
