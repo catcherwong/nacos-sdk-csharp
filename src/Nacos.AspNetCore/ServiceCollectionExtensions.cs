@@ -6,13 +6,7 @@
     using Microsoft.AspNetCore.Http.Features;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-#if NETCORE3
     using Microsoft.Extensions.Hosting;
-#else
-    using EasyCaching.InMemory;
-    using EasyCaching.Core;
-    using Microsoft.AspNetCore.Hosting;
-#endif
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using System;
@@ -44,7 +38,7 @@
             var namingClient = app.ApplicationServices.GetRequiredService<INacosNamingClient>();
             var nacosAspNetCoreConfig = app.ApplicationServices.GetRequiredService<IOptions<NacosAspNetCoreOptions>>();
             var logger = app.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger("Nacos.AspNetCore");
-          
+
             var uri = GetUri(app, nacosAspNetCoreConfig.Value);
 
             var timer = new Timer(async x =>
@@ -52,30 +46,6 @@
                 await SendAsync(namingClient, nacosAspNetCoreConfig.Value, uri, logger);
             }, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
 
-#if !NETCORE3
-            var lifetime = app.ApplicationServices.GetRequiredService<IApplicationLifetime>();
-           
-            lifetime.ApplicationStopping.Register(() =>
-            {
-                logger.LogInformation("Unregistering from Nacos");
-
-                var removeRequest = new RemoveInstanceRequest
-                {
-                    ServiceName = nacosAspNetCoreConfig.Value.ServiceName,
-                    Ip = uri.Host,
-                    Port = uri.Port,
-                    GroupName = nacosAspNetCoreConfig.Value.GroupName,
-                    NamespaceId = nacosAspNetCoreConfig.Value.Namespace,
-                    ClusterName = nacosAspNetCoreConfig.Value.ClusterName,
-                    Ephemeral = false
-                };
-
-                namingClient.RemoveInstanceAsync(removeRequest).ConfigureAwait(true);
-
-                timer.Change(Timeout.Infinite, 0);
-                timer.Dispose();
-            });
-#else
             var lifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
 
             lifetime.ApplicationStopping.Register(() =>
@@ -98,7 +68,6 @@
                 timer.Change(Timeout.Infinite, 0);
                 timer.Dispose();
             });
-#endif
 
             return app;
         }
@@ -122,7 +91,7 @@
                         weight = options.Weight,
                         cluster = options.ClusterName,
                     },
-                     NameSpaceId = options.Namespace
+                    NameSpaceId = options.Namespace
                 });
             }
             catch (Exception ex)
@@ -159,13 +128,13 @@
 
                         address = address.Replace("*", ip);
                     }
-                  
+
                     uri = new Uri(address);
                     return uri;
-                }               
+                }
             }
 
-            // current ip address third        
+            // current ip address third
             address = $"http://{GetCurrentIp()}:{port}";
 
             uri = new Uri(address);

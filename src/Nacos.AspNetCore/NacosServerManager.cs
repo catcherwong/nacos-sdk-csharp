@@ -24,7 +24,7 @@
                 var serviceInstances = await _client.ListInstancesAsync(new ListInstancesRequest
                 {
                     ServiceName = serviceName,
-                    HealthyOnly = true,                     
+                    HealthyOnly = true,
                 });
 
                 var baseUrl = string.Empty;
