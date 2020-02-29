@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;netcoreapp2.2</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
     <PackageId>nacos-sdk-csharp-unofficial.AspNetCore</PackageId>
-    <PackageVersion>0.2.2</PackageVersion>
+    <PackageVersion>0.2.5</PackageVersion>
     <Authors>Catcher Wong</Authors>
     <Owners>Catcher Wong</Owners>
     <Description>nacos csharp sdk (unofficial)</Description>
@@ -12,7 +12,8 @@
     <RepositoryUrl>https://github.com/catcherwong/nacos-sdk-csharp</RepositoryUrl>
     <ProjectUrl>https://github.com/catcherwong/nacos-sdk-csharp</ProjectUrl>
     <PackageReleaseNotes>
-      1. send heart beat add namespaceid
+      1. Upgrading dependencies.
+      2. Remove support of net core 2.2
     </PackageReleaseNotes>
   </PropertyGroup>
 
@@ -21,22 +22,13 @@
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
-    <DefineConstants>NETCORE3</DefineConstants>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Nacos\Nacos.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'">
-    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
-    <PackageReference Include="EasyCaching.InMemory" Version="0.6.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.0.0" />
-    <PackageReference Include="EasyCaching.InMemory" Version="0.8.2" />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.0" />
+    <PackageReference Include="EasyCaching.InMemory" Version="0.8.4" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 

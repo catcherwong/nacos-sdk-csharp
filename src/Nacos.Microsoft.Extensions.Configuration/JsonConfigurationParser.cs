@@ -1,26 +1,34 @@
-﻿namespace Nacos.Microsoft.Extensions.Configuration
+﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Nacos.Microsoft.Extensions.Configuration.Tests")]
+
+namespace Nacos.Microsoft.Extensions.Configuration
 {
     using global::Microsoft.Extensions.Configuration;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
 
-    public class JsonConfigurationParser : INacosConfigurationParser
+    internal class JsonConfigurationStringParser : INacosConfigurationParser
     {
+        private JsonConfigurationStringParser() { }
+
+        internal static JsonConfigurationStringParser Instance = new JsonConfigurationStringParser();
+
         private readonly IDictionary<string, string> _data = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private readonly Stack<string> _context = new Stack<string>();
         private string _currentPath;
 
         private JsonTextReader _reader;
 
-
         public IDictionary<string, string> Parse(string input)
+            => new JsonConfigurationStringParser().ParseString(input);
+
+        private IDictionary<string, string> ParseString(string input)
         {
             _data.Clear();
-
             _reader = new JsonTextReader(new StringReader(input))
             {
                 DateParseHandling = DateParseHandling.None
@@ -67,12 +75,12 @@
                 case JTokenType.Bytes:
                 case JTokenType.Raw:
                 case JTokenType.Null:
-                    VisitPrimitive(token);
+                    VisitPrimitive(token.Value<JValue>());
                     break;
 
                 default:
-                    throw new FormatException(string.Format(
-                        $"Unsupported JSON token '{ _reader.TokenType}' was found. Path '{_reader.Path}', line { _reader.LineNumber} position {_reader.LinePosition}."));
+                    throw new FormatException(
+                        $"Unsupported JSON token '{ _reader.TokenType}' was found. Path '{_reader.Path}', line { _reader.LineNumber} position {_reader.LinePosition}.");
             }
         }
 
@@ -86,17 +94,15 @@
             }
         }
 
-        private void VisitPrimitive(JToken data)
+        private void VisitPrimitive(JValue data)
         {
             var key = _currentPath;
 
             if (_data.ContainsKey(key))
             {
-                throw new FormatException(string.Format(
-                    "A duplicate key '{0}' was found.",
-                    key));
+                throw new FormatException($"A duplicate key '{key}' was found.");
             }
-            _data[key] = data.ToString();
+            _data[key] = data.ToString(CultureInfo.InvariantCulture);
         }
 
         private void EnterContext(string context)

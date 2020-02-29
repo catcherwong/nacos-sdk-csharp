@@ -17,7 +17,7 @@ namespace MsConfigApp
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<AppSettings>(Configuration);
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
             services.AddControllers();
         }
 
