@@ -13,10 +13,6 @@ namespace MsConfigApp
 {
     public class Program
     {
-        //private static IConfiguration configuration = new ConfigurationBuilder()
-        //   .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-        //   .Build();
-
         public static void Main(string[] args)
         {
             var outputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}] {Message}{NewLine}{Exception}";
@@ -55,14 +51,26 @@ namespace MsConfigApp
             Host.CreateDefaultBuilder(args)
                  .ConfigureAppConfiguration((context, builder) =>
                  {
-                     builder.AddNacosConfiguration(x =>
-                     {
-                         x.DataId = "msconfigapp";
-                         x.Group = "";
-                         x.Tenant = "f47e0ae1-982a-4a64-aea3-52506492a3d4";
-                         x.Optional = false;
-                         x.ServerAddresses = new List<string> { "localhost:8848" };
-                     });
+                     var c = builder.Build();
+
+                     var dataId = c.GetValue<string>("NacosConfig:DataId");
+                     var group = c.GetValue<string>("NacosConfig:Group");
+                     var tenant = c.GetValue<string>("NacosConfig:Tenant");
+                     var optional = c.GetValue<bool>("NacosConfig:Optional");
+                     var serverAddresses = c.GetSection("NacosConfig:ServerAddresses").Get<List<string>>();
+
+                     // read configuration from config files
+                     builder.AddNacosConfiguration(c.GetSection("NacosConfig"));
+
+                     //// hard code here
+                     //builder.AddNacosConfiguration(x =>
+                     //{
+                     //    x.DataId = dataId;
+                     //    x.Group = group;
+                     //    x.Tenant = tenant;
+                     //    x.Optional = optional;
+                     //    x.ServerAddresses = serverAddresses;
+                     //});
                  })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
