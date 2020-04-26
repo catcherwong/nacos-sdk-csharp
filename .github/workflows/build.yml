@@ -15,7 +15,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.0.100
+        dotnet-version: 3.1.200
     - name: Build with dotnet
       run: dotnet build --configuration Release
       
@@ -28,9 +28,14 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.0.100
+        dotnet-version: 3.1.200
     - name: Build with dotnet
       run: dotnet build --configuration Release
-    
+    - name: Pack with dotnet
+      run: dotnet pack /home/runner/work/nacos-sdk-csharp/nacos-sdk-csharp/nacos-sdk-csharp.sln -o /home/runner/work -c Release --no-build
+    - name: list temp
+      run: ll /home/runner/work
+    - name: Push to nuget
+      run: dotnet nuget push /home/runner/work/*.nupkg -k ${{ secrets.Nuget_Key }} --skip-duplicate -s https://www.nuget.org/api/v2/package
 
   
