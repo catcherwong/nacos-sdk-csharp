@@ -34,7 +34,7 @@ jobs:
     - name: Pack with dotnet
       run: dotnet pack /home/runner/work/nacos-sdk-csharp/nacos-sdk-csharp/nacos-sdk-csharp.sln -o /home/runner/work -c Release --no-build
     - name: list temp
-      run: ll /home/runner/work
+      run: ls /home/runner/work
     - name: Push to nuget
       run: dotnet nuget push /home/runner/work/*.nupkg -k ${{ secrets.Nuget_Key }} --skip-duplicate -s https://www.nuget.org/api/v2/package
 
