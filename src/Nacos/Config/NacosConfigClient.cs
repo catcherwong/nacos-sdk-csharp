@@ -319,7 +319,7 @@
         private string GetBaseUrl()
         {
             var hostAndPort = _serverAddressManager.GetCurrentServer();
-            return $"http://{hostAndPort}";
+            return hostAndPort;
         }
 
         public Task<string> GetServerStatus()

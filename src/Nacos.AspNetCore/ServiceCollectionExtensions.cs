@@ -109,6 +109,8 @@
             // config first
             if (!string.IsNullOrWhiteSpace(config.Ip))
             {
+                // it seems that nacos don't return the scheme
+                // so here use http only.
                 return new Uri($"http://{config.Ip}:{port}");
             }
 
@@ -135,7 +137,7 @@
             }
 
             // current ip address third
-            address = $"http://{GetCurrentIp()}:{port}";
+            address = $"{config.Scheme}://{GetCurrentIp()}:{port}";
 
             uri = new Uri(address);
             return uri;

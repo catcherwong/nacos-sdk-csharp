@@ -8,7 +8,7 @@
         /// nacos server addresses.
         /// </summary>
         /// <example>
-        /// 10.1.12.123:8848,10.1.12.124:8848
+        /// http://10.1.12.123:8848,https://10.1.12.124:8848
         /// </example>
         public List<string> ServerAddresses { get; set; }
 

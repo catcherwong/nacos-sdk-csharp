@@ -33,6 +33,8 @@
                 {
                     var list = serviceInstances.Hosts.Select(x => new NacosServer
                     {
+                        // it seems that nacos don't return the scheme
+                        // so here use http only.
                         Url = $"http://{x.Ip}:{x.Port}"
                     }).ToList();
 

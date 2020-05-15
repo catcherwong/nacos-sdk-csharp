@@ -20,24 +20,7 @@
 
             foreach (var item in serverAddresses)
             {
-                var hostAndPort = string.Empty;
-
-                var tmp = item.Split(':');
-
-                if (tmp.Length == 2)
-                {
-                    hostAndPort = item;
-                }
-                else if (tmp.Length == 1)
-                {
-                    hostAndPort = $"{tmp[0]}:8848";
-                }
-                else
-                {
-                    throw new ArgumentException(" incorrect server address, it should be [ip:port] ");
-                }
-
-                _servers.Add(hostAndPort);
+                _servers.Add(item);
             }
 
             if (_servers.Count <= 0) throw new Exceptions.NacosException("can not find out nacos server");

@@ -10,7 +10,7 @@
         /// <summary>
         /// nacos csharp client version
         /// </summary>
-        public const string ClientVersion = "Nacos-CSharp-Client-v0.2.2";
+        public const string ClientVersion = "Nacos-CSharp-Client-v0.2.7";
 
         /// <summary>
         /// nacos request module
