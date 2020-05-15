@@ -5,12 +5,6 @@
     public class NacosAspNetCoreOptions
     {
         /// <summary>
-        /// nacos server endpoint
-        /// </summary>
-        [System.Obsolete("replace with ServerAddresses")]
-        public string EndPoint { get; set; } = "http://localhost:8848";
-
-        /// <summary>
         /// nacos server addresses.
         /// </summary>
         /// <example>
