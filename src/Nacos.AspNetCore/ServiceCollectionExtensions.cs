@@ -118,7 +118,7 @@
             if (app.Properties["server.Features"] is FeatureCollection features)
             {
                 var addresses = features.Get<IServerAddressesFeature>();
-                address = addresses.Addresses.First();
+                address = addresses?.Addresses?.First();
 
                 if (address != null)
                 {
