@@ -15,8 +15,7 @@
             services.AddNacos(configure =>
             {
                 configure.DefaultTimeOut = 8;
-                //configure.EndPoint = "http://localhost:8848";
-                configure.ServerAddresses = new System.Collections.Generic.List<string> { "localhost:8848", };
+                configure.ServerAddresses = new System.Collections.Generic.List<string> { "http://localhost:8848", };
             });
 
             IServiceProvider serviceProvider = services.BuildServiceProvider();
