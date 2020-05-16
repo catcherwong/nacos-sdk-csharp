@@ -127,9 +127,14 @@
                     if (address.Contains("*"))
                     {
                         var ip = GetCurrentIp();
-
                         address = address.Replace("*", ip);
                     }
+                    else if (address.Contains("+"))
+                    {
+                        var ip = GetCurrentIp();
+                        address = address.Replace("+", ip);
+                    }
+
 
                     uri = new Uri(address);
                     return uri;
@@ -137,7 +142,7 @@
             }
 
             // current ip address third
-            address = $"{config.Scheme}://{GetCurrentIp()}:{port}";
+            address = $"http://{GetCurrentIp()}:{port}";
 
             uri = new Uri(address);
             return uri;
