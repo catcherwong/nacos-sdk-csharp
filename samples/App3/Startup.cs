@@ -37,7 +37,7 @@ namespace App3
                 endpoints.MapControllers();
             });
 
-            app.UseNacosAspNetCore();
+            //app.UseNacosAspNetCore();
         }
     }
 }

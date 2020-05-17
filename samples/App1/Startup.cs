@@ -37,7 +37,7 @@
                 endpoints.MapControllers();
             });
 
-            app.UseNacosAspNetCore();
+            //app.UseNacosAspNetCore();
         }
     }
 }
