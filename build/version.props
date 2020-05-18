@@ -1,0 +1,5 @@
+<Project>
+    <PropertyGroup>
+        <NugetVersion>0.2.7-alpha3</NugetVersion>
+    </PropertyGroup>
+</Project>

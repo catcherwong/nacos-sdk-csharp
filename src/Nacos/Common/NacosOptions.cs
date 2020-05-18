@@ -23,6 +23,16 @@
         public string Namespace { get; set; } = "";
 
         /// <summary>
+        /// accessKey
+        /// </summary>
+        public string AccessKey { get; set; }
+
+        /// <summary>
+        /// secretKey
+        /// </summary>
+        public string SecretKey { get; set; }
+
+        /// <summary>
         /// listen interval, unit is millisecond.
         /// </summary>
         public int ListenInterval { get; set; } = 1000;

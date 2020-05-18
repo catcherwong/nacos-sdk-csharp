@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../build/version.props" />
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
     <PackageId>nacos-sdk-csharp-unofficial.AspNetCore</PackageId>
-    <PackageVersion>0.2.7-alpha3</PackageVersion>
+    <PackageVersion>$(NugetVersion)</PackageVersion>
     <Authors>Catcher Wong</Authors>
     <Owners>Catcher Wong</Owners>
     <Description>nacos csharp sdk (unofficial)</Description>
@@ -23,6 +24,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Nacos\Nacos.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../LICENSE" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>
