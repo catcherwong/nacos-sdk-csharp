@@ -120,10 +120,8 @@
             _timer?.Dispose();
         }
 
-        private static Uri GetUri(IFeatureCollection features, NacosAspNetCoreOptions config)
+        private Uri GetUri(IFeatureCollection features, NacosAspNetCoreOptions config)
         {
-            Uri uri = null;
-
             var port = config.Port <= 0 ? 80 : config.Port;
 
             // config first
@@ -144,28 +142,34 @@
 
                 if (address != null)
                 {
-                    if (address.Contains("*"))
-                    {
-                        var ip = GetCurrentIp();
-                        address = address.Replace("*", ip);
-                    }
-                    else if (address.Contains("+"))
-                    {
-                        var ip = GetCurrentIp();
-                        address = address.Replace("+", ip);
-                    }
+                    ReplaceAddress(address);
 
-
-                    uri = new Uri(address);
-                    return uri;
+                    return new Uri(address);
                 }
             }
 
             // current ip address third
             address = $"http://{GetCurrentIp()}:{port}";
 
-            uri = new Uri(address);
-            return uri;
+            return new Uri(address);
+        }
+
+        private void ReplaceAddress(string address)
+        {
+            var ip = GetCurrentIp();
+
+            if (address.Contains("*"))
+            {
+                address = address.Replace("*", ip);
+            }
+            else if (address.Contains("+"))
+            {
+                address = address.Replace("+", ip);
+            }
+            else if (address.Contains("localhost", StringComparison.OrdinalIgnoreCase))
+            {
+                address = address.Replace("localhost", ip, StringComparison.OrdinalIgnoreCase);
+            }
         }
 
         private static string GetCurrentIp()

@@ -36,6 +36,10 @@ jobs:
     - name: list temp
       run: ls /home/runner/work
     - name: Push to nuget
-      run: dotnet nuget push /home/runner/work/*.nupkg -k ${{ secrets.Nuget_Key }} --skip-duplicate -s https://www.nuget.org/api/v2/package
+      run: |
+        for file in /home/runner/work/*.nupkg
+        do
+          dotnet nuget $file -k ${{ secrets.Nuget_Key }} --skip-duplicate -s https://www.nuget.org/api/v2/package
+        done  
 
   
