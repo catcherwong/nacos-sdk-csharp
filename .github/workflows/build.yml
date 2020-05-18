@@ -39,7 +39,7 @@ jobs:
       run: |
         for file in /home/runner/work/*.nupkg
         do
-          dotnet nuget $file -k ${{ secrets.Nuget_Key }} --skip-duplicate -s https://www.nuget.org/api/v2/package
+          dotnet nuget push $file -k ${{ secrets.Nuget_Key }} --skip-duplicate -s https://www.nuget.org/api/v2/package
         done  
 
   
