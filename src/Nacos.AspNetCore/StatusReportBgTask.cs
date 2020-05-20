@@ -16,11 +16,12 @@
     {
         private readonly ILogger _logger;
         private readonly INacosNamingClient _client;
-        private NacosAspNetCoreOptions _options;        
+        private readonly IFeatureCollection _features;
+        private NacosAspNetCoreOptions _options;
 
         private Timer _timer;
         private bool _reporting;
-        private readonly Uri uri = null;
+        private Uri uri = null;
 
         public StatusReportBgTask(
             ILoggerFactory loggerFactory,
@@ -31,14 +32,15 @@
             _logger = loggerFactory.CreateLogger<StatusReportBgTask>();
             _client = client;
             _options = optionsAccs.CurrentValue;
-
-            uri = GetUri(server.Features, _options);
+            _features = server.Features;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"Report instance status....");
-
+            uri = GetUri(_features, _options);
+            
+            _logger.LogInformation("Report instance ({0}:{1}) status....", uri.Host, uri.Port);
+                        
             _timer = new Timer(async x =>
             {
                 if (_reporting)
@@ -56,10 +58,12 @@
 
         private async Task ReportAsync()
         {
+            bool flag = false;
+
             try
             {
                 // send heart beat will register instance
-                await _client.SendHeartbeatAsync(new SendHeartbeatRequest
+                flag = await _client.SendHeartbeatAsync(new SendHeartbeatRequest
                 {
                     Ephemeral = false,
                     ServiceName = _options.ServiceName,
@@ -81,7 +85,7 @@
                 _logger.LogWarning(ex, "Send heart beat to Nacos error");
             }
 
-            _logger.LogDebug($"report at {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
+            _logger.LogDebug("report at {0}, status = {1}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"), flag);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
@@ -108,7 +112,7 @@
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"Unregistering error, count = {i + 1}");
+                    _logger.LogError(ex, "Unregistering error, count = {0}", i + 1);
                 }
             }
 
@@ -124,7 +128,7 @@
         {
             var port = config.Port <= 0 ? 80 : config.Port;
 
-            // config first
+            // 1. config
             if (!string.IsNullOrWhiteSpace(config.Ip))
             {
                 // it seems that nacos don't return the scheme
@@ -134,27 +138,45 @@
 
             var address = string.Empty;
 
-            // IServerAddressesFeature second
+            // 2. IServerAddressesFeature
             if (features != null)
             {
                 var addresses = features.Get<IServerAddressesFeature>();
-                address = addresses?.Addresses?.First();
+                address = addresses?.Addresses?.FirstOrDefault();
 
                 if (address != null)
                 {
-                    ReplaceAddress(address);
-
-                    return new Uri(address);
+                    var url = ReplaceAddress(address);
+                    return new Uri(url);
                 }
             }
 
-            // current ip address third
+            // 3. ASPNETCORE_URLS 
+            address = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+            if (!string.IsNullOrWhiteSpace(address))
+            {
+                var url = ReplaceAddress(address);
+                return new Uri(url);
+            }
+
+            // 4. --urls
+            var cmdArgs = Environment.GetCommandLineArgs();
+            if (cmdArgs != null && cmdArgs.Any())
+            {
+                var cmd = cmdArgs.FirstOrDefault(x => x.StartsWith("--urls", StringComparison.OrdinalIgnoreCase));
+                address = cmd.Split('=')[1];
+
+                var url = ReplaceAddress(address);
+                return new Uri(url);
+            }
+
+            // 5. current ip address third
             address = $"http://{GetCurrentIp()}:{port}";
 
             return new Uri(address);
         }
 
-        private void ReplaceAddress(string address)
+        private string ReplaceAddress(string address)
         {
             var ip = GetCurrentIp();
 
@@ -170,9 +192,15 @@
             {
                 address = address.Replace("localhost", ip, StringComparison.OrdinalIgnoreCase);
             }
+            else if (address.Contains("0.0.0.0", StringComparison.OrdinalIgnoreCase))
+            {
+                address = address.Replace("0.0.0.0", ip, StringComparison.OrdinalIgnoreCase);
+            }
+
+            return address;
         }
 
-        private static string GetCurrentIp()
+        private string GetCurrentIp()
         {
             var instanceIp = "127.0.0.1";
 

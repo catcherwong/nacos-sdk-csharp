@@ -161,15 +161,24 @@
             {
                 case System.Net.HttpStatusCode.OK:
                     var result = await responseMessage.Content.ReadAsStringAsync();
-                    if (result.Equals("ok", StringComparison.OrdinalIgnoreCase))
+                    var jObj = Newtonsoft.Json.Linq.JObject.Parse(result);
+
+                    if (jObj.ContainsKey("code"))
                     {
-                        return true;
+                        int code = int.Parse(jObj["code"].ToString());
+
+                        var flag = code == 10200;
+
+                        if (!flag) _logger.LogWarning($"[client.SendHeartbeat] server return {result} ");
+
+                        return flag;
                     }
                     else
                     {
                         _logger.LogWarning($"[client.SendHeartbeat] server return {result} ");
                         return false;
                     }
+
                 default:
                     _logger.LogWarning($"[client.SendHeartbeat] Send instance beat failed {responseMessage.StatusCode.ToString()}");
                     throw new NacosException((int)responseMessage.StatusCode, $"Send instance beat failed {responseMessage.StatusCode.ToString()}");
