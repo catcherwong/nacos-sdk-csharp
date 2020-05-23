@@ -1,5 +1,6 @@
 ﻿namespace Nacos
 {
+    using System.Collections.Generic;
     using System.Text;
     using Nacos.Utilities;
 
@@ -71,6 +72,30 @@
             }
 
             return sb.ToString();
+        }
+
+        public Dictionary<string, string> ToDict()
+        {
+            var dict = new Dictionary<string, string>
+            {
+                { "dataId", DataId },
+                { "group", Group },
+                { "content", Content }
+            };
+
+            if (!string.IsNullOrWhiteSpace(Tenant))
+                dict.Add("tenant", Tenant);
+
+            if (!string.IsNullOrWhiteSpace(Type))
+                dict.Add("type", Type);
+
+            if (!string.IsNullOrWhiteSpace(AppName))
+                dict.Add("appName", AppName);
+
+            if (!string.IsNullOrWhiteSpace(Tag))
+                dict.Add("tag", Tag);
+
+            return dict;
         }
     }
 }

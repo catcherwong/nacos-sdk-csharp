@@ -54,5 +54,15 @@
         {
             return $"Listening-Configs={ListeningConfigs}";
         }
+
+        public Dictionary<string, string> ToDict()
+        {
+            var dict = new Dictionary<string, string>
+            {
+                { "Listening-Configs", ListeningConfigs }
+            };
+        
+            return dict;
+        }
     }
 }

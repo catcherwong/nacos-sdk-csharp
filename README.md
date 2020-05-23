@@ -10,7 +10,7 @@ Unofficial csharp(dotnet core) implementation of [nacos](https://nacos.io/) Open
 
 | Platform | Build Server | Master Status  |
 |--------- |------------- |---------|
-| Travis   | Linux/OSX | [![Build Status](https://travis-ci.com/catcherwong/nacos-sdk-csharp.svg?branch=master)](https://travis-ci.com/catcherwong/nacos-sdk-csharp) |
+| Github Action   | Linux/OSX |![nacos-sdk-csharp CI](https://github.com/catcherwong/nacos-sdk-csharp/workflows/nacos-sdk-csharp%20CI/badge.svg)
 
 ## Installation
 

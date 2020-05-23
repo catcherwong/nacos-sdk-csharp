@@ -1,42 +1,29 @@
 ﻿namespace Nacos
 {
     using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Options;
     using Nacos.Exceptions;
-    using Nacos.Utilities;
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class NacosMsConfigClient : INacosConfigClient
+    /// <summary>
+    /// abstract Config Client
+    /// 1. for normal usage, using HttpClientFactory
+    /// 2. for ms config integrate, using HttpClient
+    /// </summary>
+    public abstract class AbstNacosConfigClient : INacosConfigClient
     {
-        private readonly ILogger _logger;
-        private readonly NacosOptions _options;
-        private readonly NacosHttpClient _client;
-        private readonly ILocalConfigInfoProcessor _processor;
-        private readonly List<Listener> listeners;
-        private readonly ServerAddressManager _serverAddressManager;
-        private bool isHealthServer = true;
+        protected ILogger _logger;
+        protected NacosOptions _options;
+        protected List<Listener> listeners;
+        protected ServerAddressManager _serverAddressManager;
+        protected bool isHealthServer = true;
+      
+        public abstract Config.Http.IHttpAgent GetAgent();
 
-        private readonly Dictionary<string, string> _spasHeader;
-
-        public NacosMsConfigClient(
-            ILoggerFactory loggerFactory
-            , NacosOptions options)
-        {
-            this._logger = loggerFactory.CreateLogger<NacosConfigClient>();
-            this._options = options;
-            this._processor = new MemoryLocalConfigInfoProcessor();
-            this._client = new NacosHttpClient();
-
-            this.listeners = new List<Listener>();
-            this._serverAddressManager = new ServerAddressManager(_options);
-
-            _spasHeader = new Dictionary<string, string> { { "Spas-AccessKey", _options.AccessKey } };
-        }
+        public abstract ILocalConfigInfoProcessor GetProcessor();
 
         public async Task<string> GetConfigAsync(GetConfigRequest request)
         {
@@ -48,7 +35,7 @@
             request.CheckParam();
 
             // read from local cache at first
-            var config = await _processor.GetFailoverAsync(request.DataId, request.Group, request.Tenant);
+            var config = await GetProcessor().GetFailoverAsync(request.DataId, request.Group, request.Tenant);
 
             if (!string.IsNullOrWhiteSpace(config))
             {
@@ -73,24 +60,18 @@
             if (!string.IsNullOrWhiteSpace(config))
             {
                 _logger.LogInformation($"[get-config] content from server {config}, dataId={request.DataId}, group={request.Group}, tenant={request.Tenant}");
-                await _processor.SaveSnapshotAsync(request.DataId, request.Group, request.Tenant, config);
+                await GetProcessor().SaveSnapshotAsync(request.DataId, request.Group, request.Tenant, config);
                 return config;
             }
 
-            config = await _processor.GetSnapshotAync(request.DataId, request.Group, request.Tenant);
+            config = await GetProcessor().GetSnapshotAync(request.DataId, request.Group, request.Tenant);
 
             return config;
         }
 
         private async Task<string> DoGetConfigAsync(GetConfigRequest request)
         {
-            var responseMessage = await _client.DoRequestAsync(
-                HttpMethod.Get, 
-                $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", 
-                request.ToQueryString(), 
-                _options.DefaultTimeOut,
-                _spasHeader,
-                _options.SecretKey);
+            var responseMessage = await GetAgent().GetAsync($"{GetBaseUrl()}{RequestPathValue.CONFIGS}", null, request.ToDict());
 
             switch (responseMessage.StatusCode)
             {
@@ -98,7 +79,7 @@
                     var result = await responseMessage.Content.ReadAsStringAsync();
                     return result;
                 case System.Net.HttpStatusCode.NotFound:
-                    await _processor.SaveSnapshotAsync(request.DataId, request.Group, request.Tenant, null);
+                    await GetProcessor().SaveSnapshotAsync(request.DataId, request.Group, request.Tenant, null);
                     return null;
                 case System.Net.HttpStatusCode.Forbidden:
                     throw new NacosException(ConstValue.NO_RIGHT, $"Insufficient privilege.");
@@ -116,13 +97,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _client.DoRequestAsync(
-                HttpMethod.Post, 
-                $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", 
-                request.ToQueryString(), 
-                _options.DefaultTimeOut,
-                _spasHeader,
-                _options.SecretKey);
+            var responseMessage = await GetAgent().PostAsync($"{GetBaseUrl()}{RequestPathValue.CONFIGS}", null, request.ToDict());
 
             switch (responseMessage.StatusCode)
             {
@@ -148,13 +123,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await _client.DoRequestAsync(
-                HttpMethod.Delete, 
-                $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", 
-                request.ToQueryString(), 
-                _options.DefaultTimeOut,
-                _spasHeader,
-                _options.SecretKey);
+            var responseMessage = await GetAgent().DeleteAsync($"{GetBaseUrl()}{RequestPathValue.CONFIGS}", null, request.ToDict());
 
             switch (responseMessage.StatusCode)
             {
@@ -224,7 +193,6 @@
             // clean timer
             foreach (var item in list)
             {
-                item.Timer.Change(0, Timeout.Infinite);
                 item.Timer.Dispose();
                 item.Timer = null;
             }
@@ -257,32 +225,17 @@
             var request = (AddListenerRequest)requestInfo;
 
             // read the last config
-            var lastConfig = await _processor.GetSnapshotAync(request.DataId, request.Group, request.Tenant);
+            var lastConfig = await GetProcessor().GetSnapshotAync(request.DataId, request.Group, request.Tenant);
             request.Content = lastConfig;
 
             try
             {
-                var client = new NacosHttpClient();
-
-                // longer than long pulling timeout
-                client.HttpClient.Timeout = TimeSpan.FromSeconds(ConstValue.LongPullingTimeout + 10);
-
-                var param = request.ToQueryString();
-
-                var stringContent = new StringContent(param);
-                stringContent.Headers.TryAddWithoutValidation("Long-Pulling-Timeout", (ConstValue.LongPullingTimeout * 1000).ToString());
-                stringContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/x-www-form-urlencoded");
-
-                var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{GetBaseUrl()}{RequestPathValue.CONFIGS_LISTENER}")
+                var headers = new Dictionary<string, string>()
                 {
-                    Content = stringContent
+                    { "Long-Pulling-Timeout", (ConstValue.LongPullingTimeout * 1000).ToString() }
                 };
 
-                requestMessage.Headers.TryAddWithoutValidation("Spas-AccessKey", _options.AccessKey);
-
-                HttpClientFactoryUtil.BuildSignHeader(requestMessage, param, _options.SecretKey);
-
-                var responseMessage = await client.HttpClient.SendAsync(requestMessage);
+                var responseMessage = await GetAgent().PostAsync($"{GetBaseUrl()}{RequestPathValue.CONFIGS_LISTENER}", headers, request.ToDict(), (ConstValue.LongPullingTimeout + 10) * 1000);
 
                 switch (responseMessage.StatusCode)
                 {
@@ -321,7 +274,7 @@
                 });
 
                 // update local cache
-                await _processor.SaveSnapshotAsync(request.DataId, request.Group, request.Tenant, config);
+                await GetProcessor().SaveSnapshotAsync(request.DataId, request.Group, request.Tenant, config);
 
                 // callback
                 foreach (var cb in request.Callbacks)
@@ -354,4 +307,5 @@
             return Task.FromResult(isHealthServer ? "UP" : "DOWN");
         }
     }
+
 }
