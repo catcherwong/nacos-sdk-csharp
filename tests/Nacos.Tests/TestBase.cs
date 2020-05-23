@@ -16,6 +16,9 @@
             {
                 configure.DefaultTimeOut = 8;
                 configure.ServerAddresses = new System.Collections.Generic.List<string> { "http://localhost:8848", };
+                configure.AccessKey = "";
+                configure.SecretKey = "";
+                configure.Namespace = "";
             });
 
             IServiceProvider serviceProvider = services.BuildServiceProvider();

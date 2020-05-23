@@ -82,7 +82,13 @@
 
         private async Task<string> DoGetConfigAsync(GetConfigRequest request)
         {
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Get, $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(
+                HttpMethod.Get, 
+                $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", 
+                request.ToQueryString(), 
+                _options.DefaultTimeOut, 
+                new Dictionary<string, string> { { "Spas-AccessKey", _options.AccessKey} },
+                _options.SecretKey);
 
             switch (responseMessage.StatusCode)
             {
@@ -108,7 +114,13 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Post, $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(
+                HttpMethod.Post, 
+                $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", 
+                request.ToQueryString(), 
+                _options.DefaultTimeOut,
+                new Dictionary<string, string> { { "Spas-AccessKey", _options.AccessKey } },
+                _options.SecretKey);
 
             switch (responseMessage.StatusCode)
             {
@@ -134,7 +146,13 @@
 
             request.CheckParam();
 
-            var responseMessage = await _clientFactory.DoRequestAsync(HttpMethod.Delete, $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _clientFactory.DoRequestAsync(
+                HttpMethod.Delete, 
+                $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", 
+                request.ToQueryString(), 
+                _options.DefaultTimeOut,
+                new Dictionary<string, string> { { "Spas-AccessKey", _options.AccessKey } },
+                _options.SecretKey);
 
             switch (responseMessage.StatusCode)
             {

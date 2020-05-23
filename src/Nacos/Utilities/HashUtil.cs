@@ -1,9 +1,10 @@
 ﻿namespace Nacos.Utilities
 {
+    using System;
     using System.Security.Cryptography;
     using System.Text;
 
-    public static class Md5Util
+    public static class HashUtil
     {
         public static string GetMd5(string value)
         {
@@ -26,6 +27,22 @@
             }
 
             return result;
+        }
+
+        public static string GetHMACSHA1(string value, string key)
+        {
+            byte[] secrectKey = Encoding.UTF8.GetBytes(key);
+            using (HMACSHA1 hmac = new HMACSHA1(secrectKey))
+            {
+                hmac.Initialize();
+
+                byte[] bytes_hmac_in = Encoding.UTF8.GetBytes(value);
+                byte[] bytes_hamc_out = hmac.ComputeHash(bytes_hmac_in);
+
+                string str_hamc_out = Convert.ToBase64String(bytes_hamc_out);
+
+                return str_hamc_out;
+            }
         }
     }
 }

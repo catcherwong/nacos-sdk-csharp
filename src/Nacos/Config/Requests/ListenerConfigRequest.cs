@@ -17,7 +17,7 @@
         /// <summary>
         /// A packet field indicating the MD5 value of the configuration.
         /// </summary>
-        public string ContentMD5 => Md5Util.GetMd5(Content);
+        public string ContentMD5 => HashUtil.GetMd5(Content);
 
         /// <summary>
         /// A packet field indicating tenant information. It corresponds to the Namespace field in Nacos.

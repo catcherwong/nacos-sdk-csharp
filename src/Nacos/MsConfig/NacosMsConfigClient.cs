@@ -21,6 +21,8 @@
         private readonly ServerAddressManager _serverAddressManager;
         private bool isHealthServer = true;
 
+        private readonly Dictionary<string, string> _spasHeader;
+
         public NacosMsConfigClient(
             ILoggerFactory loggerFactory
             , NacosOptions options)
@@ -32,6 +34,8 @@
 
             this.listeners = new List<Listener>();
             this._serverAddressManager = new ServerAddressManager(_options);
+
+            _spasHeader = new Dictionary<string, string> { { "Spas-AccessKey", _options.AccessKey } };
         }
 
         public async Task<string> GetConfigAsync(GetConfigRequest request)
@@ -80,7 +84,13 @@
 
         private async Task<string> DoGetConfigAsync(GetConfigRequest request)
         {
-            var responseMessage = await _client.DoRequestAsync(HttpMethod.Get, $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _client.DoRequestAsync(
+                HttpMethod.Get, 
+                $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", 
+                request.ToQueryString(), 
+                _options.DefaultTimeOut,
+                _spasHeader,
+                _options.SecretKey);
 
             switch (responseMessage.StatusCode)
             {
@@ -106,7 +116,13 @@
 
             request.CheckParam();
 
-            var responseMessage = await _client.DoRequestAsync(HttpMethod.Post, $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _client.DoRequestAsync(
+                HttpMethod.Post, 
+                $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", 
+                request.ToQueryString(), 
+                _options.DefaultTimeOut,
+                _spasHeader,
+                _options.SecretKey);
 
             switch (responseMessage.StatusCode)
             {
@@ -132,7 +148,13 @@
 
             request.CheckParam();
 
-            var responseMessage = await _client.DoRequestAsync(HttpMethod.Delete, $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", request.ToQueryString(), _options.DefaultTimeOut);
+            var responseMessage = await _client.DoRequestAsync(
+                HttpMethod.Delete, 
+                $"{GetBaseUrl()}{RequestPathValue.CONFIGS}", 
+                request.ToQueryString(), 
+                _options.DefaultTimeOut,
+                _spasHeader,
+                _options.SecretKey);
 
             switch (responseMessage.StatusCode)
             {
@@ -245,7 +267,9 @@
                 // longer than long pulling timeout
                 client.HttpClient.Timeout = TimeSpan.FromSeconds(ConstValue.LongPullingTimeout + 10);
 
-                var stringContent = new StringContent(request.ToQueryString());
+                var param = request.ToQueryString();
+
+                var stringContent = new StringContent(param);
                 stringContent.Headers.TryAddWithoutValidation("Long-Pulling-Timeout", (ConstValue.LongPullingTimeout * 1000).ToString());
                 stringContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/x-www-form-urlencoded");
 
@@ -253,6 +277,10 @@
                 {
                     Content = stringContent
                 };
+
+                requestMessage.Headers.TryAddWithoutValidation("Spas-AccessKey", _options.AccessKey);
+
+                HttpClientFactoryUtil.BuildSignHeader(requestMessage, param, _options.SecretKey);
 
                 var responseMessage = await client.HttpClient.SendAsync(requestMessage);
 
