@@ -22,7 +22,6 @@
             _processor = processor;
 
             listeners = new List<Listener>();
-            _serverAddressManager = new ServerAddressManager(_options);
         }
 
         public override IHttpAgent GetAgent()

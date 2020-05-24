@@ -21,7 +21,6 @@
             _httpAgent = new MsConfigServerHttpAgent(_options);
 
             listeners = new List<Listener>();
-            _serverAddressManager = new ServerAddressManager(_options);
         }
 
         public override IHttpAgent GetAgent()

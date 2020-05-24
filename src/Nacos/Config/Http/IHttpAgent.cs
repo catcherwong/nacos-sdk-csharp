@@ -33,5 +33,22 @@ namespace Nacos.Config.Http
         /// <param name="paramValues">paramValues</param>
         /// <param name="timeout">timeout</param>
         Task<HttpResponseMessage> DeleteAsync(string path, Dictionary<string, string> headers, Dictionary<string, string> paramValues, int timeout = 8000);
+
+        /// <summary>
+        /// get name
+        /// </summary>        
+        string GetName();
+
+        /// <summary>
+        /// get namespace
+        /// </summary>
+        /// <returns></returns>
+        string GetNamespace();
+
+        /// <summary>
+        /// get tenant
+        /// </summary>
+        /// <returns></returns>
+        string GetTenant();
     }
 }

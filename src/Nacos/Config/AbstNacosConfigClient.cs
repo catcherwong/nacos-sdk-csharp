@@ -18,7 +18,6 @@
         protected ILogger _logger;
         protected NacosOptions _options;
         protected List<Listener> listeners;
-        protected ServerAddressManager _serverAddressManager;
         protected bool isHealthServer = true;
       
         public abstract Config.Http.IHttpAgent GetAgent();
@@ -71,7 +70,7 @@
 
         private async Task<string> DoGetConfigAsync(GetConfigRequest request)
         {
-            var responseMessage = await GetAgent().GetAsync($"{GetBaseUrl()}{RequestPathValue.CONFIGS}", null, request.ToDict());
+            var responseMessage = await GetAgent().GetAsync(RequestPathValue.CONFIGS, null, request.ToDict());
 
             switch (responseMessage.StatusCode)
             {
@@ -97,7 +96,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await GetAgent().PostAsync($"{GetBaseUrl()}{RequestPathValue.CONFIGS}", null, request.ToDict());
+            var responseMessage = await GetAgent().PostAsync(RequestPathValue.CONFIGS, null, request.ToDict());
 
             switch (responseMessage.StatusCode)
             {
@@ -123,7 +122,7 @@
 
             request.CheckParam();
 
-            var responseMessage = await GetAgent().DeleteAsync($"{GetBaseUrl()}{RequestPathValue.CONFIGS}", null, request.ToDict());
+            var responseMessage = await GetAgent().DeleteAsync(RequestPathValue.CONFIGS, null, request.ToDict());
 
             switch (responseMessage.StatusCode)
             {
@@ -235,7 +234,7 @@
                     { "Long-Pulling-Timeout", (ConstValue.LongPullingTimeout * 1000).ToString() }
                 };
 
-                var responseMessage = await GetAgent().PostAsync($"{GetBaseUrl()}{RequestPathValue.CONFIGS_LISTENER}", headers, request.ToDict(), (ConstValue.LongPullingTimeout + 10) * 1000);
+                var responseMessage = await GetAgent().PostAsync(RequestPathValue.CONFIGS_LISTENER, headers, request.ToDict(), (ConstValue.LongPullingTimeout + 10) * 1000);
 
                 switch (responseMessage.StatusCode)
                 {
@@ -294,12 +293,6 @@
         private void SetHealthServer(bool flag)
         {
             isHealthServer = flag;
-        }
-
-        private string GetBaseUrl()
-        {
-            var hostAndPort = _serverAddressManager.GetCurrentServer();
-            return hostAndPort;
         }
 
         public Task<string> GetServerStatus()
