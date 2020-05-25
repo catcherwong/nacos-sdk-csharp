@@ -13,6 +13,15 @@
         public List<string> ServerAddresses { get; set; }
 
         /// <summary>
+        /// EndPoint
+        /// </summary>
+        public string EndPoint { get; set; }
+
+        public string ContextPath { get; set; } = "nacos";
+
+        public string ClusterName { get; set; } = "serverlist";
+
+        /// <summary>
         /// default timeout, unit is second.
         /// </summary>
         public int DefaultTimeOut { get; set; } = 15;
