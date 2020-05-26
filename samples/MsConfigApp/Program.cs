@@ -32,6 +32,8 @@ namespace MsConfigApp
                     encoding: System.Text.Encoding.UTF8)*/
                 .CreateLogger();
 
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
             try
             {
                 Log.ForContext<Program>().Information("Application starting...");

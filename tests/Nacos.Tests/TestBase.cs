@@ -19,6 +19,7 @@
                 configure.AccessKey = "";
                 configure.SecretKey = "";
                 configure.Namespace = "";
+                configure.EndPoint = "acm.aliyun.com";
             });
 
             IServiceProvider serviceProvider = services.BuildServiceProvider();
