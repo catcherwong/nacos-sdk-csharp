@@ -71,5 +71,22 @@
         /// over threshold
         /// </summary>
         public const int OVER_THRESHOLD = 503;
+
+        public static string ENV_LIST_KEY = "envList";
+
+        public static string ALL_IPS = "000--00-ALL_IPS--00--000";
+
+        public static string FAILOVER_SWITCH = "00-00---000-VIPSRV_FAILOVER_SWITCH-000---00-00";
+
+        public static string DEFAULT_NAMESPACE_ID = "public";
+
+        public static int REQUEST_DOMAIN_RETRY_COUNT = 3;
+
+        public static string SERVER_ADDR_IP_SPLITER = ":";
+
+        public static string HTTP = "http://";
+
+        public static string HTTPS = "https://";
+
     }
 }
