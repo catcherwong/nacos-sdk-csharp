@@ -12,6 +12,8 @@
     public class ServerListManager : IDisposable
     {
         public const string FIXED_NAME = "fixed";
+        private const string HTTP = "http";
+        private const string HTTPS = "https";
 
         private string _name = "";
         private string _namespace = "";
@@ -75,13 +77,16 @@
                     _namespace = @namespace;
                     _tenant = $"{options.EndPoint}-{@namespace}";
                     _name = $"{FIXED_NAME}-{GetFixedNameSuffix(_serverUrls)}-{@namespace}";
+
                     _addressServerUrl = $"http://{options.EndPoint}:{_endpointPort}/{_contentPath}/{_defaultNodesPath}?namespace={@namespace}";
                 }
 
                 t = new Timer(async x =>
                 {
                     await RefreshSrvAsync();
-                }, null,TimeSpan.Zero, TimeSpan.FromSeconds(10));
+                }, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+
+                RefreshSrvAsync().ConfigureAwait(false).GetAwaiter().GetResult();
             }
         }
 
@@ -90,7 +95,7 @@
             try
             {
                 if (_serverUrls != null && _serverUrls.Count > 0) return;
-               
+
                 var list = await GetServerListFromEndpointAsync();
 
                 if (list == null || list.Count <= 0)
@@ -102,13 +107,14 @@
 
                 foreach (var server in list)
                 {
-                    if (server.StartsWith("http", StringComparison.OrdinalIgnoreCase) || server.StartsWith("https", StringComparison.OrdinalIgnoreCase))
+                    if (server.StartsWith(HTTP, StringComparison.OrdinalIgnoreCase)
+                        || server.StartsWith(HTTPS, StringComparison.OrdinalIgnoreCase))
                     {
                         newServerAddrList.Add(server);
                     }
                     else
                     {
-                        newServerAddrList.Add($"http{server}");
+                        newServerAddrList.Add($"{HTTP}://{server}");
                     }
                 }
 
@@ -124,7 +130,7 @@
             {
 
             }
-        }      
+        }
 
         private async Task<List<string>> GetServerListFromEndpointAsync()
         {
@@ -137,10 +143,6 @@
                     client.Timeout = TimeSpan.FromMilliseconds(3000);
 
                     var req = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, _addressServerUrl);
-                    req.Headers.TryAddWithoutValidation("Client-Version", ConstValue.ClientVersion);
-                    req.Headers.TryAddWithoutValidation("User-Agent", ConstValue.ClientVersion);
-                    req.Headers.TryAddWithoutValidation("RequestId", Guid.NewGuid().ToString());
-                    req.Headers.TryAddWithoutValidation("Request-Module", ConstValue.RequestModule);
 
                     var resp = await client.SendAsync(req);
 

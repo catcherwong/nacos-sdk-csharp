@@ -59,9 +59,14 @@
         {
             var dict = new Dictionary<string, string>
             {
-                { "Listening-Configs", ListeningConfigs }
+                { "Listening-Configs", ListeningConfigs },
+                { "dataId", DataId },
+                { "group", Group },
             };
-        
+
+            if (!string.IsNullOrWhiteSpace(Tenant))
+                dict.Add("tenant", Tenant);
+
             return dict;
         }
     }

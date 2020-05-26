@@ -23,12 +23,36 @@
         /// <summary>
         /// Configuration group
         /// </summary>
-        public string  Group { get; set; }
+        public string Group { get; set; }
 
         /// <summary>
         /// Tenant information. It corresponds to the Namespace field in Nacos.
         /// </summary>
         public string Tenant { get; set; }
+
+        /// <summary>
+        /// EndPoint
+        /// </summary>
+        public string EndPoint { get; set; }
+
+        public string ContextPath { get; set; } = "nacos";
+
+        public string ClusterName { get; set; } = "serverlist";
+
+        /// <summary>
+        /// default timeout, unit is second.
+        /// </summary>
+        public int DefaultTimeOut { get; set; } = 15;
+
+        /// <summary>
+        /// accessKey
+        /// </summary>
+        public string AccessKey { get; set; }
+
+        /// <summary>
+        /// secretKey
+        /// </summary>
+        public string SecretKey { get; set; }
 
         /// <summary>
         /// The configuration parser, default is json 

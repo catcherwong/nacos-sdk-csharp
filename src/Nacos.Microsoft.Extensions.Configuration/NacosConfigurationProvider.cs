@@ -22,6 +22,12 @@
             {
                 ServerAddresses = configurationSource.ServerAddresses,
                 Namespace = configurationSource.Tenant,
+                AccessKey = configurationSource.AccessKey,
+                ClusterName = configurationSource.ClusterName,
+                ContextPath = configurationSource.ContextPath,
+                EndPoint = configurationSource.EndPoint,
+                DefaultTimeOut = configurationSource.DefaultTimeOut,
+                SecretKey = configurationSource.SecretKey,
                 ListenInterval = 5000
             });
 
