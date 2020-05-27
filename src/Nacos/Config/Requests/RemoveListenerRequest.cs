@@ -26,15 +26,15 @@
         /// </summary>
         /// <value>The callbacks.</value>
         public List<Action> Callbacks { get; set; } = new List<Action>();
-           
+
         public override void CheckParam()
         {
             ParamUtil.CheckTDG(Tenant, DataId, Group);
         }
 
-        public override string ToQueryString()
+        public override Dictionary<string, string> ToDict()
         {
-            return string.Empty;
+            return new Dictionary<string, string>();
         }
     }
 }

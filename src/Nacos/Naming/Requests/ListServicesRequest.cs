@@ -1,5 +1,6 @@
 ﻿namespace Nacos
 {
+    using System.Collections.Generic;
     using System.Text;
 
     public class ListServicesRequest : BaseRequest
@@ -29,22 +30,21 @@
             //return PageNo > 0 && PageSize > 0;
         }
 
-        public override string ToQueryString()
+        public override Dictionary<string, string> ToDict()
         {
-            var sb = new StringBuilder(1024);
-            sb.Append($"pageNo={PageNo}&pageSize={PageSize}");
+            var dict = new Dictionary<string, string>
+            {
+                { "pageNo", PageNo.ToString() },
+                { "pageSize", PageSize.ToString() },
+            };
 
             if (!string.IsNullOrWhiteSpace(NamespaceId))
-            {
-                sb.Append($"&namespaceId={NamespaceId}");
-            }
+                dict.Add("namespaceId", NamespaceId);
 
             if (!string.IsNullOrWhiteSpace(GroupName))
-            {
-                sb.Append($"&groupName={GroupName}");
-            }
+                dict.Add("groupName", GroupName);
 
-            return sb.ToString();
+            return dict;
         }
     }
 }

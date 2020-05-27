@@ -10,7 +10,8 @@
         {
             var request = new CreateServiceRequest
             {
-                ServiceName = "testservice"
+                ServiceName = "testservice",
+                ProtectThreshold = 0.1f                
             };
 
             var res = await _namingClient.CreateServiceAsync(request);

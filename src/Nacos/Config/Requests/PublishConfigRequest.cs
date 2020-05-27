@@ -43,38 +43,10 @@
 
         public override void CheckParam()
         {
-            ParamUtil.CheckParam(DataId, Group, Content);            
+            ParamUtil.CheckParam(DataId, Group, Content);
         }
 
-        public override string ToQueryString()
-        {
-            var sb = new StringBuilder(2048);
-            sb.Append($"dataId={DataId}&group={Group}&content={Content}");
-
-            if (!string.IsNullOrWhiteSpace(Tenant))
-            {             
-                sb.Append($"&tenant={Tenant}");
-            }      
-
-            if(!string.IsNullOrWhiteSpace(Type))
-            {
-                sb.Append($"&type={Type}");
-            }
-
-            if (!string.IsNullOrWhiteSpace(AppName))
-            {
-                sb.Append($"&appName={AppName}");
-            }
-
-            if (!string.IsNullOrWhiteSpace(Tag))
-            {
-                sb.Append($"&tag={Tag}");
-            }
-
-            return sb.ToString();
-        }
-
-        public Dictionary<string, string> ToDict()
+        public override Dictionary<string, string> ToDict()
         {
             var dict = new Dictionary<string, string>
             {

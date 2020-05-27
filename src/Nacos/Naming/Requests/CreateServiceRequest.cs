@@ -1,6 +1,7 @@
 ﻿namespace Nacos
 {
     using Nacos.Utilities;
+    using System.Collections.Generic;
     using System.Text;
 
     public class CreateServiceRequest : BaseRequest
@@ -40,37 +41,29 @@
             ParamUtil.CheckServiceName(ServiceName);
         }
 
-        public override string ToQueryString()
+        public override Dictionary<string, string> ToDict()
         {
-            var sb = new StringBuilder(1024);
-            sb.Append($"serviceName={ServiceName}");
+            var dict = new Dictionary<string, string>
+            {
+                { "serviceName", ServiceName },
+            };
 
             if (!string.IsNullOrWhiteSpace(NamespaceId))
-            {             
-                sb.Append($"&namespaceId={NamespaceId}");
-            }
-         
+                dict.Add("namespaceId", NamespaceId);
+
             if (!string.IsNullOrWhiteSpace(Metadata))
-            {
-                sb.Append($"&metadata={Metadata}");
-            }
+                dict.Add("metadata", Metadata);
 
             if (!string.IsNullOrWhiteSpace(GroupName))
-            {
-                sb.Append($"&groupName={GroupName}");
-            }
+                dict.Add("groupName", GroupName);
 
             if (!string.IsNullOrWhiteSpace(Selector))
-            {
-                sb.Append($"&selector={Selector}");
-            }
+                dict.Add("selector", Selector);
 
             if (ProtectThreshold.HasValue)
-            {
-                sb.Append($"&protectThreshold={ProtectThreshold}");
-            }      
+                dict.Add("protectThreshold", ProtectThreshold.ToString());
 
-            return sb.ToString();
+            return dict;
         }
     }
 }

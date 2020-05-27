@@ -1,7 +1,7 @@
 ﻿namespace Nacos
 {
-    using System.Text;
     using Nacos.Utilities;
+    using System.Collections.Generic;
 
     public class RegisterInstanceRequest : BaseRequest
     {
@@ -62,50 +62,40 @@
 
         public override void CheckParam()
         {
-            ParamUtil.CheckInstanceInfo(Ip, Port, ServiceName);            
+            ParamUtil.CheckInstanceInfo(Ip, Port, ServiceName);
         }
 
-        public override string ToQueryString()
+        public override Dictionary<string, string> ToDict()
         {
-            var sb = new StringBuilder(1024);
-            sb.Append($"ip={Ip}&port={Port}&serviceName={ServiceName}");
+            var dict = new Dictionary<string, string>
+            {
+                { "serviceName", ServiceName },
+                { "ip", Ip },
+                { "port", Port.ToString() },
+            };
 
             if (!string.IsNullOrWhiteSpace(NamespaceId))
-            {             
-                sb.Append($"&namespaceId={NamespaceId}");
-            }
-
-            if (Weight.HasValue)
-            {
-                sb.Append($"&weight={Weight.Value}");
-            }
-
-            if (Healthy.HasValue)
-            {
-                sb.Append($"&healthy={Healthy}");
-            }
-
-            if (!string.IsNullOrWhiteSpace(Metadata))
-            {
-                sb.Append($"&metadata={Metadata}");
-            }
-
-            if (!string.IsNullOrWhiteSpace(ClusterName))
-            {
-                sb.Append($"&clusterName={ClusterName}");
-            }
+                dict.Add("namespaceId", NamespaceId);
 
             if (!string.IsNullOrWhiteSpace(GroupName))
-            {
-                sb.Append($"&groupName={GroupName}");
-            }
+                dict.Add("groupName", GroupName);
+
+            if (!string.IsNullOrWhiteSpace(Metadata))
+                dict.Add("metadata", Metadata);
+
+            if (Weight.HasValue)
+                dict.Add("weight", Weight.Value.ToString());
+
+            if (!string.IsNullOrWhiteSpace(ClusterName))
+                dict.Add("clusterName", ClusterName);
 
             if (Ephemeral.HasValue)
-            {
-                sb.Append($"&ephemeral={Ephemeral}");
-            }      
+                dict.Add("ephemeral", Ephemeral.Value.ToString());
 
-            return sb.ToString();
+            if (Healthy.HasValue)
+                dict.Add("healthy", Healthy.Value.ToString());
+
+            return dict;
         }
     }
 }

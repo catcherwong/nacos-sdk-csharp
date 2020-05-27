@@ -1,5 +1,6 @@
 ﻿namespace Nacos
 {
+    using System.Collections.Generic;
     using System.Text;
 
     public class ModifySwitchesRequest : BaseRequest
@@ -18,23 +19,24 @@
         /// if affect the local server, true means yes, false means no, default true
         /// </summary>
         public bool? Debug { get; set; }
-       
+
         public override void CheckParam()
         {
             //return !string.IsNullOrWhiteSpace(Entry) && !string.IsNullOrWhiteSpace(Value);
         }
 
-        public override string ToQueryString()
+        public override Dictionary<string, string> ToDict()
         {
-            var sb = new StringBuilder(1024);
-            sb.Append($"entry={Entry}&value={Value}");
-            
-            if (Debug.HasValue)
+            var dict = new Dictionary<string, string>
             {
-                sb.Append($"&debug={Debug.Value}");
-            }      
+                { "entry", Entry },
+                { "value", Value },
+            };
 
-            return sb.ToString();
+            if (Debug.HasValue)
+                dict.Add("debug", Debug.Value.ToString());
+
+            return dict;
         }
     }
 }

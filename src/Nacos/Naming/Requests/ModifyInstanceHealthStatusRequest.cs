@@ -1,7 +1,7 @@
 ﻿namespace Nacos
 {
     using Nacos.Utilities;
-    using System.Text;
+    using System.Collections.Generic;
 
     public class ModifyInstanceHealthStatusRequest : BaseRequest
     {
@@ -45,28 +45,26 @@
             ParamUtil.CheckInstanceInfo(Ip, Port, ServiceName);
         }
 
-        public override string ToQueryString()
+        public override Dictionary<string, string> ToDict()
         {
-            var sb = new StringBuilder(1024);
-            sb.Append($"ip={Ip}&port={Port}&serviceName={ServiceName}&healthy={Healthy}");
-
-            if (!string.IsNullOrWhiteSpace(GroupName))
+            var dict = new Dictionary<string, string>
             {
-                sb.Append($"&groupName={GroupName}");
-            }
+                { "serviceName", ServiceName },
+                { "ip", Ip },
+                { "port", Port.ToString() },
+                { "healthy", Healthy.ToString() },
+            };
 
             if (!string.IsNullOrWhiteSpace(NamespaceId))
-            {
-                sb.Append($"&namespaceId={NamespaceId}");
-            }
+                dict.Add("namespaceId", NamespaceId);
+
+            if (!string.IsNullOrWhiteSpace(GroupName))
+                dict.Add("groupName", GroupName);
 
             if (!string.IsNullOrWhiteSpace(ClusterName))
-            {
-                sb.Append($"&clusterName={ClusterName}");
-            }
+                dict.Add("clusterName", ClusterName);
 
-
-            return sb.ToString();
+            return dict;
         }
     }
 }

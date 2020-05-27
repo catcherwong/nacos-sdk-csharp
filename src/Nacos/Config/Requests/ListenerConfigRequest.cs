@@ -1,6 +1,7 @@
 ﻿namespace Nacos
 {
     using Nacos.Utilities;
+    using System.Collections.Generic;
 
     public class ListenerConfigRequest : BaseRequest
     {
@@ -42,9 +43,12 @@
             //return !string.IsNullOrWhiteSpace(DataId);            
         }
 
-        public override string ToQueryString()
+        public override Dictionary<string, string> ToDict()
         {
-            return $"Listening-Configs={ListeningConfigs}";
+            return new Dictionary<string, string>()
+            {
+                { "Listening-Configs", ListeningConfigs }
+            };
         }
     }
 }

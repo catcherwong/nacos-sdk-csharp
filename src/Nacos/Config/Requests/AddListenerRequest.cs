@@ -50,12 +50,7 @@
             ParamUtil.CheckTDG(Tenant, DataId, Group);
         }
 
-        public override string ToQueryString()
-        {
-            return $"Listening-Configs={ListeningConfigs}";
-        }
-
-        public Dictionary<string, string> ToDict()
+        public override Dictionary<string, string> ToDict()
         {
             var dict = new Dictionary<string, string>
             {

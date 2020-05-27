@@ -1,7 +1,7 @@
 ﻿namespace Nacos
 {
     using Nacos.Utilities;
-    using System.Text;
+    using System.Collections.Generic;
 
     public class RemoveInstanceRequest : BaseRequest
     {
@@ -45,32 +45,28 @@
             ParamUtil.CheckInstanceInfo(Ip, Port, ServiceName);
         }
 
-        public override string ToQueryString()
+        public override Dictionary<string, string> ToDict()
         {
-            var sb = new StringBuilder(1024);
-            sb.Append($"ip={Ip}&port={Port}&serviceName={ServiceName}");
+            var dict = new Dictionary<string, string>
+            {
+                { "serviceName", ServiceName },
+                { "ip", Ip },
+                { "port", Port.ToString() },
+            };
 
             if (!string.IsNullOrWhiteSpace(NamespaceId))
-            {             
-                sb.Append($"&namespaceId={NamespaceId}");
-            }
-          
-            if (!string.IsNullOrWhiteSpace(ClusterName))
-            {
-                sb.Append($"&clusterName={ClusterName}");
-            }
+                dict.Add("namespaceId", NamespaceId);
 
             if (!string.IsNullOrWhiteSpace(GroupName))
-            {
-                sb.Append($"&groupName={GroupName}");
-            }
+                dict.Add("groupName", GroupName);
+
+            if (!string.IsNullOrWhiteSpace(ClusterName))
+                dict.Add("clusterName", ClusterName);
 
             if (Ephemeral.HasValue)
-            {
-                sb.Append($"&ephemeral={Ephemeral}");
-            }      
+                dict.Add("ephemeral", Ephemeral.Value.ToString());
 
-            return sb.ToString();
+            return dict;
         }
     }
 }

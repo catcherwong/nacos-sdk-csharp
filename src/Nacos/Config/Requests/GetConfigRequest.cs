@@ -26,20 +26,7 @@
             ParamUtil.CheckKeyParam(DataId, Group);
         }
 
-        public override string ToQueryString()
-        {
-            var sb = new StringBuilder(100);
-            sb.Append($"dataId={DataId}&group={Group}");
-
-            if (!string.IsNullOrWhiteSpace(Tenant))
-            {             
-                sb.Append($"&tenant={Tenant}");
-            }                     
-
-            return sb.ToString();
-        }
-
-        public Dictionary<string, string> ToDict()
+        public override Dictionary<string, string> ToDict()
         {
             var dict = new Dictionary<string, string>
             {

@@ -22,7 +22,7 @@
         public string ClusterName { get; set; } = "serverlist";
 
         /// <summary>
-        /// default timeout, unit is second.
+        /// default timeout, unit is Milliseconds.
         /// </summary>
         public int DefaultTimeOut { get; set; } = 15;
 

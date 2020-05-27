@@ -30,11 +30,11 @@
 
         public NamingProxy(
           ILoggerFactory loggerFactory,
-          IOptions<NacosOptions> optionsAccs,
+          NacosOptions optionsAccs,
           IHttpClientFactory clientFactory)
         {
             _logger = loggerFactory.CreateLogger<NamingProxy>();
-            _options = optionsAccs.Value;
+            _options = optionsAccs;
             _clientFactory = clientFactory;
 
             _serverUrls = new List<string>();
@@ -77,12 +77,13 @@
                     return;
                 }
 
+                if (DateTimeOffset.Now.ToUnixTimeSeconds() - _lastSrvRefTime < _vipSrvRefInterMillis)
+                    return;
+
                 var list = await GetServerListFromEndpointAsync();
 
                 if (list == null || list.Count <= 0)
-                {
                     throw new Exception("Can not acquire Nacos list");
-                }
 
                 List<string> newServerAddrList = new List<string>();
 
@@ -156,7 +157,7 @@
             }
         }
 
-        public async Task<string> ReqApiAsync(HttpMethod httpMethod, string path, Dictionary<string, string> headers, Dictionary<string, string> paramValues, int timeout)
+        public async Task<HttpResponseMessage> ReqApiAsync(HttpMethod httpMethod, string path, Dictionary<string, string> headers, Dictionary<string, string> paramValues, int timeout)
         {
             if ((_serverUrls == null || !_serverUrls.Any())
                 && string.IsNullOrWhiteSpace(_nacosDomain))
@@ -203,7 +204,7 @@
             throw new Nacos.Exceptions.NacosException(0, $"failed to req API:{path} after all servers(" + string.Join(",", _serverUrls) + ") tried: ");
         }
 
-        private async Task<string> CallServerAsync(HttpMethod httpMethod, string server, string path, Dictionary<string, string> headers, Dictionary<string, string> paramValues, int timeout)
+        private async Task<HttpResponseMessage> CallServerAsync(HttpMethod httpMethod, string server, string path, Dictionary<string, string> headers, Dictionary<string, string> paramValues, int timeout)
         {
             var requestMessage = new HttpRequestMessage
             {
@@ -252,14 +253,10 @@
 
             var responseMessage = await client.SendAsync(requestMessage);
 
-            if (responseMessage.IsSuccessStatusCode)
+            if (responseMessage.IsSuccessStatusCode
+                || responseMessage.StatusCode == System.Net.HttpStatusCode.NotModified)
             {
-                var content = await responseMessage.Content.ReadAsStringAsync();
-                return content;
-            }
-            if (responseMessage.StatusCode == System.Net.HttpStatusCode.NotModified)
-            {
-                return string.Empty;
+                return responseMessage;
             }
 
             throw new Nacos.Exceptions.NacosException((int)responseMessage.StatusCode, "");

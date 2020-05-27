@@ -1,7 +1,7 @@
 ﻿namespace Nacos
 {
     using Nacos.Utilities;
-    using System.Text;
+    using System.Collections.Generic;
 
     public class ModifyInstanceRequest : BaseRequest
     {
@@ -58,50 +58,40 @@
 
         public override void CheckParam()
         {
-            ParamUtil.CheckInstanceInfo(Ip, Port, ServiceName);            
+            ParamUtil.CheckInstanceInfo(Ip, Port, ServiceName);
         }
 
-        public override string ToQueryString()
+        public override Dictionary<string, string> ToDict()
         {
-            var sb = new StringBuilder(1024);
-            sb.Append($"ip={Ip}&port={Port}&serviceName={ServiceName}");
+            var dict = new Dictionary<string, string>
+            {
+                { "serviceName", ServiceName },
+                { "ip", Ip },
+                { "port", Port.ToString() },
+            };
 
             if (!string.IsNullOrWhiteSpace(NamespaceId))
-            {             
-                sb.Append($"&namespaceId={NamespaceId}");
-            }
-
-            if (Weight.HasValue)
-            {
-                sb.Append($"&weight={Weight.Value}");
-            }
-         
-            if (!string.IsNullOrWhiteSpace(Metadata))
-            {
-                sb.Append($"&metadata={Metadata}");
-            }
-
-            if (!string.IsNullOrWhiteSpace(ClusterName))
-            {
-                sb.Append($"&clusterName={ClusterName}");
-            }
+                dict.Add("namespaceId", NamespaceId);
 
             if (!string.IsNullOrWhiteSpace(GroupName))
-            {
-                sb.Append($"&groupName={GroupName}");
-            }
+                dict.Add("groupName", GroupName);
+
+            if (!string.IsNullOrWhiteSpace(ClusterName))
+                dict.Add("clusterName", ClusterName);
+
+            if (!string.IsNullOrWhiteSpace(Metadata))
+                dict.Add("metadata", Metadata);
 
             if (Ephemeral.HasValue)
-            {
-                sb.Append($"&ephemeral={Ephemeral}");
-            }    
+                dict.Add("ephemeral", Ephemeral.ToString());
 
-            if(Enabled.HasValue)
-            {
-                sb.Append($"&enabled={Enabled.Value}");
-            }  
+            if (Enabled.HasValue)
+                dict.Add("enabled", Enabled.Value.ToString());
 
-            return sb.ToString();
+            if (Weight.HasValue)
+                dict.Add("weight", Weight.Value.ToString());
+
+            return dict;
         }
     }
 }

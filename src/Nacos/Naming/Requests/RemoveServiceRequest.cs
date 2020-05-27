@@ -1,7 +1,7 @@
 ﻿namespace Nacos
 {
     using Nacos.Utilities;
-    using System.Text;
+    using System.Collections.Generic;
 
     public class RemoveServiceRequest : BaseRequest
     {
@@ -25,22 +25,20 @@
             ParamUtil.CheckServiceName(ServiceName);
         }
 
-        public override string ToQueryString()
+        public override Dictionary<string, string> ToDict()
         {
-            var sb = new StringBuilder(1024);
-            sb.Append($"serviceName={ServiceName}");
+            var dict = new Dictionary<string, string>
+            {
+                { "serviceName", ServiceName },
+            };
 
             if (!string.IsNullOrWhiteSpace(NamespaceId))
-            {             
-                sb.Append($"&namespaceId={NamespaceId}");
-            }
-                 
+                dict.Add("namespaceId", NamespaceId);
+
             if (!string.IsNullOrWhiteSpace(GroupName))
-            {
-                sb.Append($"&groupName={GroupName}");
-            }
-        
-            return sb.ToString();
+                dict.Add("groupName", GroupName);
+
+            return dict;
         }
     }
 }

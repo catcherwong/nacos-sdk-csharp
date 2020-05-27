@@ -1,6 +1,7 @@
 ﻿namespace Nacos
 {
     using Nacos.Utilities;
+    using System.Collections.Generic;
     using System.Text;
 
     public class GetInstanceRequest : BaseRequest
@@ -50,37 +51,31 @@
             ParamUtil.CheckInstanceInfo(Ip, Port, ServiceName);
         }
 
-        public override string ToQueryString()
+        public override Dictionary<string, string> ToDict()
         {
-            var sb = new StringBuilder(1024);
-            sb.Append($"ip={Ip}&port={Port}&serviceName={ServiceName}");
+            var dict = new Dictionary<string, string>
+            {
+                { "serviceName", ServiceName },
+                { "ip", Ip },
+                { "port", Port.ToString() },
+            };
 
             if (!string.IsNullOrWhiteSpace(NamespaceId))
-            {             
-                sb.Append($"&namespaceId={NamespaceId}");
-            }
-          
+                dict.Add("namespaceId", NamespaceId);
+
             if (!string.IsNullOrWhiteSpace(Cluster))
-            {
-                sb.Append($"&cluster={Cluster}");
-            }
+                dict.Add("cluster", Cluster);
 
             if (!string.IsNullOrWhiteSpace(GroupName))
-            {
-                sb.Append($"&groupName={GroupName}");
-            }
+                dict.Add("groupName", GroupName);
 
             if (HealthyOnly.HasValue)
-            {
-                sb.Append($"&healthyOnly={HealthyOnly.Value}");
-            }
+                dict.Add("healthyOnly", HealthyOnly.Value.ToString());
 
             if (Ephemeral.HasValue)
-            {
-                sb.Append($"&ephemeral={Ephemeral.Value}");
-            }
+                dict.Add("ephemeral", Ephemeral.Value.ToString());
 
-            return sb.ToString();
+            return dict;
         }
     }
 }

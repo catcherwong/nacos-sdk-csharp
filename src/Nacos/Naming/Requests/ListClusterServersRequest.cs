@@ -1,5 +1,7 @@
 ﻿namespace Nacos
 {
+    using System.Collections.Generic;
+
     public class ListClusterServersRequest : BaseRequest
     {
         /// <summary>
@@ -12,16 +14,14 @@
             //return true;
         }
 
-        public override string ToQueryString()
+        public override Dictionary<string, string> ToDict()
         {
-            var sb = string.Empty;           
+            var dict = new Dictionary<string, string>();
 
             if (Healthy.HasValue)
-            {
-                sb = $"&healthy={Healthy.Value}";
-            }      
+                dict.Add("healthy", Healthy.Value.ToString());
 
-            return sb;
+            return dict;
         }
     }
 }
