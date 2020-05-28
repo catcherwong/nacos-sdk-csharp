@@ -88,5 +88,11 @@
 
         public static string HTTPS = "https://";
 
+        public static string HTTP_PREFIX = "http";
+
+        public static string ACCESS_TOKEN = "accessToken";
+
+        public static string TOKEN_TTL = "tokenTtl";
+
     }
 }

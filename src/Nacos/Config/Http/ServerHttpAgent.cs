@@ -6,6 +6,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
+    using System.Threading;
     using System.Threading.Tasks;
 
     public class ServerHttpAgent : HttpAgent
@@ -14,6 +15,10 @@
         private readonly NacosOptions _options;
         private readonly IHttpClientFactory _clientFactory;
         private readonly ServerListManager _serverListMgr;
+        private readonly Nacos.Security.SecurityProxy _securityProxy;
+        private readonly string _namespaceId;
+        private readonly Timer _timer;
+        private long _securityInfoRefreshIntervalMills = 5000;
 
         public ServerHttpAgent(
             ILoggerFactory loggerFactory, 
@@ -23,8 +28,17 @@
             _logger = loggerFactory.CreateLogger<ServerHttpAgent>();
             _options = optionsAccs.Value;
             _clientFactory = clientFactory;
+            _namespaceId = _options.Namespace;
 
             _serverListMgr = new ServerListManager(_options);
+            _securityProxy = new Security.SecurityProxy(_options);
+
+            _securityProxy.LoginAsync(_serverListMgr.GetServerUrls()).ConfigureAwait(false).GetAwaiter().GetResult();
+
+            _timer = new Timer(async x =>
+            {
+                await _securityProxy.LoginAsync(_serverListMgr.GetServerUrls());
+            }, null, 0, _securityInfoRefreshIntervalMills);
         }
 
         public override string AbstGetName() => _serverListMgr.GetName();
@@ -59,6 +73,8 @@
                 }
             }
 
+            InjectSecurityInfo(requestMessage, paramValues);
+
             HttpAgentCommon.BuildHeader(requestMessage, headers);
             HttpAgentCommon.BuildSpasHeaders(requestMessage, paramValues, _options.AccessKey, _options.SecretKey);
 
@@ -77,6 +93,19 @@
             }
 
             throw new System.Net.Http.HttpRequestException($"no available server, currentServerAddr : {currentServerAddr}");
+        }
+
+        private void InjectSecurityInfo(HttpRequestMessage requestMessage, Dictionary<string, string> paramValues)
+        {
+            if (!string.IsNullOrWhiteSpace(_securityProxy.GetAccessToken()))
+            {
+                requestMessage.Headers.TryAddWithoutValidation(ConstValue.ACCESS_TOKEN, _securityProxy.GetAccessToken());
+            }
+
+            if (!string.IsNullOrWhiteSpace(_namespaceId) && paramValues != null && !paramValues.ContainsKey("tenant"))
+            {
+                requestMessage.Headers.TryAddWithoutValidation("tenant", _namespaceId);
+            }
         }
 
         private string GetUrl(string serverAddr, string relativePath)
