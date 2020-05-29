@@ -28,8 +28,10 @@
                 EndPoint = configurationSource.EndPoint,
                 DefaultTimeOut = configurationSource.DefaultTimeOut,
                 SecretKey = configurationSource.SecretKey,
+                Password = configurationSource.Password,
+                UserName = configurationSource.UserName,
                 ListenInterval = 5000
-            });
+            }) ;
 
             _client.AddListenerAsync(new AddListenerRequest
             {

@@ -9,7 +9,7 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class ServerHttpAgent : HttpAgent
+    public class ServerHttpAgent : HttpAgent, IDisposable
     {
         private readonly ILogger _logger;
         private readonly NacosOptions _options;
@@ -52,8 +52,10 @@
             var client = _clientFactory.CreateClient(ConstValue.ClientName);
             client.Timeout = TimeSpan.FromMilliseconds(timeout);
 
-            var requestMessage = new HttpRequestMessage();
-            requestMessage.Method = httpMethod;
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = httpMethod
+            };
 
             var currentServerAddr = _serverListMgr.GetCurrentServerAddr();
 
@@ -73,10 +75,10 @@
                 }
             }
 
-            InjectSecurityInfo(requestMessage, paramValues);
-
             HttpAgentCommon.BuildHeader(requestMessage, headers);
             HttpAgentCommon.BuildSpasHeaders(requestMessage, paramValues, _options.AccessKey, _options.SecretKey);
+
+            InjectSecurityInfo(requestMessage, paramValues);
 
             var responseMessage = await client.SendAsync(requestMessage);
 
@@ -111,6 +113,11 @@
         private string GetUrl(string serverAddr, string relativePath)
         {           
             return  $"{serverAddr}{relativePath}";
+        }
+
+        public void Dispose()
+        {
+            _timer?.Dispose();
         }
     }
 }

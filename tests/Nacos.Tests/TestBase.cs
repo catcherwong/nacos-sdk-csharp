@@ -18,7 +18,11 @@
                 configure.ServerAddresses = new System.Collections.Generic.List<string> { "http://localhost:8848", };
                 configure.AccessKey = "";
                 configure.SecretKey = "";
-                configure.Namespace = "";
+                configure.Namespace = "f47e0ae1-982a-4a64-aea3-52506492a3d4";
+                //configure.Namespace = "";
+                configure.UserName = "aa";
+                //configure.UserName = "test";
+                configure.Password = "123456";
                 configure.EndPoint = "acm.aliyun.com";
             });
 
