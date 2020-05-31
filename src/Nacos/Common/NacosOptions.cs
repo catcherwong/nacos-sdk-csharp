@@ -24,7 +24,7 @@
         /// <summary>
         /// default timeout, unit is Milliseconds.
         /// </summary>
-        public int DefaultTimeOut { get; set; } = 15;
+        public int DefaultTimeOut { get; set; } = 15000;
 
         /// <summary>
         /// default namespace

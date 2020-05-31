@@ -1,5 +1,5 @@
 <Project>
     <PropertyGroup>
-        <NugetVersion>0.2.7-alpha6</NugetVersion>
+        <NugetVersion>0.2.7-alpha7</NugetVersion>
     </PropertyGroup>
 </Project>

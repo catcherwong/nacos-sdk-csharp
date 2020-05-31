@@ -91,5 +91,99 @@
 
             return services;
         }
+
+        public static IServiceCollection AddNacosNaming(this IServiceCollection services, Action<NacosOptions> configure, Action<HttpClient> httpClientAction = null)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.AddOptions();
+            services.Configure(configure);
+
+            var clientBuilder = services.AddHttpClient(ConstValue.ClientName)
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler() { UseProxy = false });
+
+            if (httpClientAction != null)
+            {
+                clientBuilder.ConfigureHttpClient(httpClientAction);
+            }
+
+            services.AddSingleton<INacosNamingClient, NacosNamingClient>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddNacosNaming(this IServiceCollection services, IConfiguration configuration, Action<HttpClient> httpClientAction = null, string sectionName = "nacos")
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.Configure<NacosOptions>(configuration.GetSection(sectionName));
+
+            var clientBuilder = services.AddHttpClient(ConstValue.ClientName)
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler() { UseProxy = false });
+
+            if (httpClientAction != null)
+            {
+                clientBuilder.ConfigureHttpClient(httpClientAction);
+            }
+
+            services.AddSingleton<INacosNamingClient, NacosNamingClient>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddNacosConfig(this IServiceCollection services, Action<NacosOptions> configure, Action<HttpClient> httpClientAction = null)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.AddOptions();
+            services.Configure(configure);
+
+            var clientBuilder = services.AddHttpClient(ConstValue.ClientName)
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler() { UseProxy = false });
+
+            if (httpClientAction != null)
+            {
+                clientBuilder.ConfigureHttpClient(httpClientAction);
+            }
+
+            services.TryAddSingleton<ILocalConfigInfoProcessor, MemoryLocalConfigInfoProcessor>();
+            services.TryAddSingleton<Nacos.Config.Http.IHttpAgent, Nacos.Config.Http.ServerHttpAgent>();
+            services.AddSingleton<INacosConfigClient, NacosConfigClient>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddNacosConfig(this IServiceCollection services, IConfiguration configuration, Action<HttpClient> httpClientAction = null, string sectionName = "nacos")
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.Configure<NacosOptions>(configuration.GetSection(sectionName));
+
+            var clientBuilder = services.AddHttpClient(ConstValue.ClientName)
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler() { UseProxy = false });
+
+            if (httpClientAction != null)
+            {
+                clientBuilder.ConfigureHttpClient(httpClientAction);
+            }
+
+            services.TryAddSingleton<ILocalConfigInfoProcessor, MemoryLocalConfigInfoProcessor>();
+            services.TryAddSingleton<Nacos.Config.Http.IHttpAgent, Nacos.Config.Http.ServerHttpAgent>();
+            services.AddSingleton<INacosConfigClient, NacosConfigClient>();
+
+            return services;
+        }
     }
 }

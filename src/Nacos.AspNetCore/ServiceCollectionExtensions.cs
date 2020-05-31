@@ -18,7 +18,8 @@
         {
             services.Configure<NacosAspNetCoreOptions>(configuration.GetSection("nacos"));
 
-            services.AddNacos(configuration);
+            //services.AddNacos(configuration);
+            services.AddNacosNaming(configuration);
 
             services.AddEasyCaching(options =>
             {
