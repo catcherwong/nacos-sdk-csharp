@@ -26,6 +26,12 @@
         private long _lastSrvRefTime = 0;
         private readonly int _vipSrvRefInterMillis = 30 * 1000;
 
+
+        private readonly Nacos.Security.SecurityProxy _securityProxy;
+        private readonly string _namespaceId;
+        private Timer _timer;
+        private long _securityInfoRefreshIntervalMills = 5000;
+
         private Timer t;
 
         public NamingProxy(
@@ -40,6 +46,7 @@
             _serverUrls = new List<string>();
             _namespace = _options.Namespace;
             _endpoint = _options.EndPoint;
+            _securityProxy = new Security.SecurityProxy(_options);
 
             var serverAddresses = _options.ServerAddresses;
             
@@ -63,8 +70,15 @@
             {
                 await RefreshSrvIfNeedAsync();
             }, null, 0, _vipSrvRefInterMillis);
+         
+            _timer = new Timer(async x =>
+            {
+                await _securityProxy.LoginAsync(_serverUrls);
+            }, null, 0, _securityInfoRefreshIntervalMills);
 
             RefreshSrvIfNeedAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+            _securityProxy.LoginAsync(_serverUrls).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         private async Task RefreshSrvIfNeedAsync()
@@ -211,7 +225,7 @@
                 Method = httpMethod
             };
 
-            CheckSignature(paramValues);
+            InjectSecurityInfo(requestMessage, paramValues);
 
             requestMessage.Headers.TryAddWithoutValidation("Client-Version", ConstValue.ClientVersion);
             requestMessage.Headers.TryAddWithoutValidation("User-Agent", ConstValue.ClientVersion);
@@ -262,22 +276,44 @@
             throw new Nacos.Exceptions.NacosException((int)responseMessage.StatusCode, "");
         }
 
-        private void CheckSignature(Dictionary<string, string> param)
+        private void InjectSecurityInfo(HttpRequestMessage requestMessage, Dictionary<string, string> paramValues)
         {
-            param.Add("app", AppDomain.CurrentDomain.FriendlyName);
-            if (string.IsNullOrWhiteSpace(_options.AccessKey) 
+            if (!string.IsNullOrWhiteSpace(_securityProxy.GetAccessToken()))
+            {
+                requestMessage.Headers.TryAddWithoutValidation(ConstValue.ACCESS_TOKEN, _securityProxy.GetAccessToken());
+            }
+
+            paramValues.Add("app", AppDomain.CurrentDomain.FriendlyName);
+            if (string.IsNullOrWhiteSpace(_options.AccessKey)
                 && string.IsNullOrWhiteSpace(_options.SecretKey))
                 return;
 
-            string signData = string.IsNullOrWhiteSpace(param["serviceName"]) 
-                ? DateTimeOffset.Now.ToUnixTimeSeconds().ToString() + "@@" + param["serviceName"] 
+            string signData = string.IsNullOrWhiteSpace(paramValues["serviceName"])
+                ? DateTimeOffset.Now.ToUnixTimeSeconds().ToString() + "@@" + paramValues["serviceName"]
                 : DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
 
             string signature = Utilities.HashUtil.GetHMACSHA1(signData, _options.SecretKey);
-            param.Add("signature", signature);
-            param.Add("data", signData);
-            param.Add("ak", _options.AccessKey);
+            paramValues.Add("signature", signature);
+            paramValues.Add("data", signData);
+            paramValues.Add("ak", _options.AccessKey);
         }
+
+        //private void CheckSignature(Dictionary<string, string> param)
+        //{
+        //    param.Add("app", AppDomain.CurrentDomain.FriendlyName);
+        //    if (string.IsNullOrWhiteSpace(_options.AccessKey) 
+        //        && string.IsNullOrWhiteSpace(_options.SecretKey))
+        //        return;
+
+        //    string signData = string.IsNullOrWhiteSpace(param["serviceName"]) 
+        //        ? DateTimeOffset.Now.ToUnixTimeSeconds().ToString() + "@@" + param["serviceName"] 
+        //        : DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+
+        //    string signature = Utilities.HashUtil.GetHMACSHA1(signData, _options.SecretKey);
+        //    param.Add("signature", signature);
+        //    param.Add("data", signData);
+        //    param.Add("ak", _options.AccessKey);
+        //}
 
         public void Dispose()
         {
