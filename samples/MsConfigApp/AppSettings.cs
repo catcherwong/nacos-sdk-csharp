@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace MsConfigApp
+﻿namespace MsConfigApp
 {
-    /*
+	using System.Collections.Generic;
+
+	/*
      {
 	"ConnectionStrings": {
 		"Default": "Server=127.0.0.1;Port=3306;Database=demo;User Id=root;Password=123456;"
@@ -18,7 +18,7 @@ namespace MsConfigApp
 	}
 }
          */
-    public class AppSettings
+	public class AppSettings
     { 
         public string Str { get; set; }
 

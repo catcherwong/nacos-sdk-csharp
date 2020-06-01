@@ -10,7 +10,7 @@ Unofficial csharp(dotnet core) implementation of [nacos](https://nacos.io/) Open
 
 | Platform | Build Server | Master Status  |
 |--------- |------------- |---------|
-| Github Action   | Linux/OSX |![nacos-sdk-csharp CI](https://github.com/catcherwong/nacos-sdk-csharp/workflows/nacos-sdk-csharp%20CI/badge.svg)
+| Github Action   | Linux/Windows |![nacos-sdk-csharp CI](https://github.com/catcherwong/nacos-sdk-csharp/workflows/nacos-sdk-csharp%20CI/badge.svg)
 
 ## Installation
 
@@ -18,221 +18,167 @@ Unofficial csharp(dotnet core) implementation of [nacos](https://nacos.io/) Open
 dotnet add package nacos-sdk-csharp-unofficial
 ```
 
-## Usages
+## Features
 
-### Dependency Injection(DI)
+- Basic OpenApi Usages
+- Integrate ASP.NET Core Configuration System
+- Service Registration and Discovery With ASP.NET Core
+- Integrate With Aliyun ACM
+- ...
+
+## Basic Usage
+
+### Simple Configuration Usage
+
+1. Configure in `Program.cs`
+
+```cs
+public static IHostBuilder CreateHostBuilder(string[] args) =>
+    Host.CreateDefaultBuilder(args)
+        .ConfigureAppConfiguration((context, builder) =>
+        {
+            var c = builder.Build();
+
+            // read configuration from config files
+            builder.AddNacosConfiguration(c.GetSection("NacosConfig"));
+        })
+        .ConfigureWebHostDefaults(webBuilder =>
+        {
+            webBuilder.UseStartup<Startup>();
+        })
+```
+
+2. Modify `appsettings.json`
+
+```JSON
+{
+  "NacosConfig": {
+    "Optional": false,
+    "DataId": "msconfigapp",
+    "Group": "",
+    "Tenant": "f47e0ae1-982a-4a64-aea3-52506492a3d4",
+    "ServerAddresses": [ "http://localhost:8848/" ],
+    "UserName": "test2",
+    "Password": "123456",
+    "AccessKey": "",
+    "SecretKey": "",
+    "EndPoint": "acm.aliyun.com"
+  }
+}
+```
+
+3. Use via .NET Core's Way
+
+```cs
+[ApiController]
+[Route("api/[controller]")]
+public class ConfigController : ControllerBase
+{
+    private readonly IConfiguration _configuration;
+    private readonly AppSettings _settings;
+    private readonly AppSettings _sSettings;
+    private readonly AppSettings _mSettings;
+    
+    public ConfigController(
+        IConfiguration configuration,
+        IOptions<AppSettings> options,
+        IOptionsSnapshot<AppSettings> sOptions,
+        IOptionsMonitor<AppSettings> _mOptions
+        )
+    {
+        _logger = logger;
+        _configuration = configuration;
+        _settings = options.Value;
+        _sSettings = sOptions.Value;
+        _mSettings = _mOptions.CurrentValue;
+    }
+
+    [HttpGet]
+    public string Get()
+    {
+        // ....
+       
+        return "ok";
+    }
+
+}
+```
+
+### Service Registration and Discovery
+
+1. Service Registration
+
+Configure in `Program.cs`
 
 ```cs
 public class Startup
 {
-    //...
-    
+    public Startup(IConfiguration configuration)
+    {
+        Configuration = configuration;
+    }
+
+    public IConfiguration Configuration { get; }
+
     public void ConfigureServices(IServiceCollection services)
     {
-        // configuration
-        services.AddNacos(configure =>
-        {
-            // default timeout
-            configure.DefaultTimeOut = 8;
-            // nacos's server addresses
-            configure.ServerAddresses = new List<string> { "localhost:8848", };
-            // namespace
-            configure.Namespace = "";
-            // listen interval
-            configure.ListenInterval = 1000;
-        });   
+        // ...
 
-        //// or read from configuration file
-        //services.AddNacos(Configuration);
-    }    
+        services.AddNacosAspNetCore(Configuration);
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        // ...
+    }
 }
 ```
 
-Sample of configuration file
+Modify `appsettings.json`
 
 ```JSON
+"nacos": {
+    "ServerAddresses": [ "http://localhost:8848" ],
+    "DefaultTimeOut": 15000,
+    "Namespace": "",
+    "ListenInterval": 1000,
+    "ServiceName": "App1"
+  }
+```
+
+2. Service Discovery
+
+```cs
+[Route("api/[controller]")]
+[ApiController]
+public class ValuesController : ControllerBase
 {
-    "nacos": {        
-        "ServerAddresses": [ "localhost:8848" ],
-        "DefaultTimeOut": 15,
-        "Namespace": "",
-        "ListenInterval": 1000,
+    private readonly INacosServerManager _serverManager;
+
+    public ValuesController(INacosServerManager serverManager)
+    {
+        _serverManager = serverManager;
+    }
+
+    [HttpGet("test")]
+    public async Task<IActionResult> Test()
+    {        
+        // need to know the service name.
+        // at this time only support random way.
+        var baseUrl = await _serverManager.GetServerAsync("App2");
+                    
+        if(string.IsNullOrWhiteSpace(baseUrl))
+        {
+            return "empty";
+        }
+
+        var url = $"{baseUrl}/api/values";
+
+        using (HttpClient client = new HttpClient())
+        {
+            var result = await client.GetAsync(url);
+            return await result.Content.ReadAsStringAsync();
+        }
     }
 }
 ```
-
-### Configuration Management
-
-```cs
-// Get the nacos config client via DI
-var _client = IServiceProvider.GetService<INacosConfigClient>();
-
-// Get configurations
-var getConfigResult = await _client.GetConfigAsync(new GetConfigRequest
-{
-    DataId = "dataId",
-    Group = "DEFAULT_GROUP",
-    //Tenant = "tenant"
-});
-
-// Publish configuration
-var publishConfigRessult = await _client.PublishConfigAsync(new PublishConfigRequest
-{
-    DataId = "dataId",
-    Group = "DEFAULT_GROUP",
-    //Tenant = "tenant",
-    Content = "test"
-});
-
-// Delete configuration
-var removeConfigResult = await _client.RemoveConfigAsync(new RemoveConfigRequest
-{
-    DataId = "dataId",
-    Group = "DEFAULT_GROUP",
-    //Tenant = "tenant"
-});
-
-// Add listener
-await _configClient.AddListenerAsync(new AddListenerRequest
-{
-    DataId = "dataId",
-    //Group = "DEFAULT_GROUP",
-    //Tenant = "tenant",
-    Callbacks = new List<Action<string>>
-    {
-        x =>{ Console.WriteLine(x); },
-    }
-});
-
-// Remove listener
-await _configClient.RemoveListenerAsync(new RemoveListenerRequest
-{
-    DataId = "dataId",
-    Callbacks = new List<Action>
-    {
-        () =>{ Console.WriteLine("removed listener"); },
-    }
-});
-```
-
-### Service Discovery
-
-```cs
-// Get the nacos naming client via DI
-var _client = IServiceProvider.GetService<INacosNamingClient>();
-
-// Register instance
-var registerInstance = await _client.RegisterInstanceAsync(new RegisterInstanceRequest
-{
-    ServiceName = "testservice",
-    Ip = "192.168.0.74",
-    Port = 9999
-});
-
-// Deregister instance
-var removeInstance = await _client.RemoveInstanceAsync(new RemoveInstanceRequest
-{
-    ServiceName = "testservice",
-    Ip = "192.168.0.74",
-    Port = 9999
-});
-
-// Modify instance
-var modifyInstance = await _client.ModifyInstanceAsync(new ModifyInstanceRequest
-{
-    ServiceName = "testservice",
-    Ip = "192.168.0.74",
-    Port = 5000
-});
-
-// Query instances
-var listInstances = await _client.ListInstancesAsync(new ListInstancesRequest
-{
-    ServiceName = "testservice",
-});
-   
-// Query instance detail
-var getInstance = await _client.GetInstanceAsync(new GetInstanceRequest
-{
-    ServiceName = "testservice",
-    Ip = "192.168.0.74",
-    Port = 9999,                 
-});
-
-// Send instance beat
-var sendHeartbeat = await _client.SendHeartbeatAsync(new SendHeartbeatRequest
-{
-    ServiceName = "testservice",
-    BeatInfo = new BeatInfo
-    {
-        ServiceName = "testservice",
-        Ip = "192.168.0.74",
-        Port = 9999,                     
-    }
-});
-    
-// Create service
-var createService = await _client.CreateServiceAsync(new CreateServiceRequest
-{
-    ServiceName = "testservice"
-});
-
-// Delete service
-var removeService = await _client.RemoveServiceAsync(new RemoveServiceRequest
-{
-    ServiceName = "testservice"
-});
-
-// Update service
-var modifyService = await _client.ModifyServiceAsync(new ModifyServiceRequest
-{
-    ServiceName = "testservice",
-    ProtectThreshold = 0.5,
-});
-
-// Query service
-var getService = await _client.GetServiceAsync(new GetServiceRequest
-{
-    ServiceName = "testservice",
-});
-
-// Query service list
-var listServices = await _client.ListServicesAsync(new ListServicesRequest
-{
-    PageNo = 1,
-    PageSize = 2,
-});
-
-// Query system switches
-var getSwitches = await _client.GetSwitchesAsync();
-
-// Update system switch
-var modifySwitches = await _client.ModifySwitchesAsync(new ModifySwitchesRequest
-{
-    Debug = true,
-    Entry = "test",
-    Value = "test"
-});
-
-// Query system metrics
-var getMetricsres = await _client.GetMetricsAsync();
-
-// Query server list
-var listClusterServers = await _client.ListClusterServersAsync(new ListClusterServersRequest
-{
-        
-});
-
-// Query the leader of current cluster
-var getCurrentClusterLeader = await _client.GetCurrentClusterLeaderAsync();
-
-// Update instance health status
-var modifyInstanceHealthStatus = await _client.ModifyInstanceHealthStatusAsync(new ModifyInstanceHealthStatusRequest
-{
-    Ip = "192.168.0.74",
-    Port = 9999,
-    ServiceName = "testservice",
-    Healthy = false,
-});
-```
-

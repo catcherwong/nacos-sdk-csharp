@@ -107,7 +107,8 @@
             {
                 try
                 {
-                    await _client.RemoveInstanceAsync(removeRequest);
+                    var flag = await _client.RemoveInstanceAsync(removeRequest);
+                    _logger.LogDebug("remove instance, status = {0}", flag);
                     break;
                 }
                 catch (Exception ex)

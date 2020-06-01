@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
-
-namespace App1.Controllers
+﻿namespace App1.Controllers
 {
+    using System.Collections.Generic;
     using System.Net.Http;
+    using Microsoft.AspNetCore.Mvc;
     using Nacos.AspNetCore;
-
 
     [Route("api/[controller]")]
     [ApiController]

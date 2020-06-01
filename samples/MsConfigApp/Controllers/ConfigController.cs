@@ -1,13 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-
-namespace MsConfigApp.Controllers
+﻿namespace MsConfigApp.Controllers
 {
+    using System;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
+
     [ApiController]
     [Route("api/[controller]")]
     public class ConfigController : ControllerBase

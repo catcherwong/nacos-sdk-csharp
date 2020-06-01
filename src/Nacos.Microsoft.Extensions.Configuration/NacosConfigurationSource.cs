@@ -40,9 +40,9 @@
         public string ClusterName { get; set; } = "serverlist";
 
         /// <summary>
-        /// default timeout, unit is second.
+        /// default timeout, unit is Milliseconds.
         /// </summary>
-        public int DefaultTimeOut { get; set; } = 15;
+        public int DefaultTimeOut { get; set; } = 15000;
 
         /// <summary>
         /// accessKey
@@ -54,8 +54,14 @@
         /// </summary>
         public string SecretKey { get; set; }
 
+        /// <summary>
+        /// username
+        /// </summary>
         public string UserName { get; set; }
 
+        /// <summary>
+        /// password
+        /// </summary>
         public string Password { get; set; }
 
         /// <summary>

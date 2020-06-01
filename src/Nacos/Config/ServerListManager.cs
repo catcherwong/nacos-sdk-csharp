@@ -126,7 +126,7 @@
                 int index = random.Next(0, _serverUrls.Count);
                 _currentServerAddr = _serverUrls[index];
             }
-            catch (Exception ex)
+            catch
             {
 
             }

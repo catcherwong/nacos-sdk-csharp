@@ -8,14 +8,14 @@
         /// nacos server addresses.
         /// </summary>
         /// <example>
-        /// 10.1.12.123:8848,10.1.12.124:8848
+        /// http://10.1.12.123:8848,https://10.1.12.124:8848
         /// </example>
         public List<string> ServerAddresses { get; set; }
 
         /// <summary>
-        /// default timeout, unit is second.
+        /// default timeout, unit is Milliseconds.
         /// </summary>
-        public int DefaultTimeOut { get; set; } = 15;
+        public int DefaultTimeOut { get; set; } = 15000;
 
         /// <summary>
         /// default namespace
@@ -41,7 +41,7 @@
         /// <summary>
         /// the weight of this instance.
         /// </summary>
-        public double Weight { get; set; } = 10;
+        public double Weight { get; set; } = 100;
 
         /// <summary>
         /// the ip of this instance
