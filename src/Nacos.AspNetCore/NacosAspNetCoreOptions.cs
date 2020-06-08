@@ -52,5 +52,7 @@
         /// the port of this instace
         /// </summary>
         public int Port { get; set; }
+
+        public Dictionary<string,string> Metadata { get; set; }
     }
 }

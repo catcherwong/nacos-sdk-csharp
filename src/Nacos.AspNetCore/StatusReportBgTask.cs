@@ -76,6 +76,7 @@
                         scheduled = true,
                         weight = _options.Weight,
                         cluster = _options.ClusterName,
+                        metadata= _options.Metadata,
                     },
                     NameSpaceId = _options.Namespace
                 });
