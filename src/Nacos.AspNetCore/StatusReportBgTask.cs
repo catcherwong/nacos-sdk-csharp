@@ -38,9 +38,9 @@
         public Task StartAsync(CancellationToken cancellationToken)
         {
             uri = GetUri(_features, _options);
-            
+
             _logger.LogInformation("Report instance ({0}:{1}) status....", uri.Host, uri.Port);
-                        
+
             _timer = new Timer(async x =>
             {
                 if (_reporting)
@@ -76,7 +76,7 @@
                         scheduled = true,
                         weight = _options.Weight,
                         cluster = _options.ClusterName,
-                        metadata= _options.Metadata,
+                        metadata = _options.Metadata,
                     },
                     NameSpaceId = _options.Namespace
                 });

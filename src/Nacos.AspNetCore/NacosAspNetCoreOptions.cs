@@ -49,10 +49,13 @@
         public string Ip { get; set; }
 
         /// <summary>
-        /// the port of this instace
+        /// the port of this instance
         /// </summary>
         public int Port { get; set; }
 
+        /// <summary>
+        /// the metadata of this instance
+        /// </summary>
         public Dictionary<string,string> Metadata { get; set; }
     }
 }
