@@ -2,6 +2,7 @@
 {
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
     using Nacos;
     using Nacos.AspNetCore;
     using System;
@@ -53,6 +54,9 @@
 
             services.AddSingleton<INacosServerManager, NacosServerManager>();
 
+            services.AddSingleton<ILocalConfigInfoProcessor,MemoryLocalConfigInfoProcessor>();
+            services.TryAddSingleton<Nacos.Config.Http.IHttpAgent, Nacos.Config.Http.ServerHttpAgent>();
+            services.AddSingleton<INacosConfigClient, NacosConfigClient>();
             // IHostedService, report instance status
             services.AddHostedService<StatusReportBgTask>();
 
