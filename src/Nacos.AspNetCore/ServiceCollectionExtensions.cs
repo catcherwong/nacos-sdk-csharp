@@ -2,7 +2,10 @@
 {
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
+    using Nacos;
     using Nacos.AspNetCore;
+    using System;
 
     public static class ServiceCollectionExtensions
     {
@@ -28,6 +31,31 @@
 
             services.AddSingleton<INacosServerManager, NacosServerManager>();
 
+            // IHostedService, report instance status
+            services.AddHostedService<StatusReportBgTask>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddNacosAspNetCore(
+          this IServiceCollection services,
+          Action<NacosAspNetCoreOptions> nacosAspNetCoreOptions,
+          Action<NacosOptions>  nacosOptions
+          )
+        {
+            services.Configure(nacosAspNetCoreOptions);
+            services.AddNacosNaming(nacosOptions);
+
+            services.AddEasyCaching(options =>
+            {
+                options.UseInMemory("nacos.aspnetcore");
+            });
+
+            services.AddSingleton<INacosServerManager, NacosServerManager>();
+
+            services.AddSingleton<ILocalConfigInfoProcessor,MemoryLocalConfigInfoProcessor>();
+            services.TryAddSingleton<Nacos.Config.Http.IHttpAgent, Nacos.Config.Http.ServerHttpAgent>();
+            services.AddSingleton<INacosConfigClient, NacosConfigClient>();
             // IHostedService, report instance status
             services.AddHostedService<StatusReportBgTask>();
 
