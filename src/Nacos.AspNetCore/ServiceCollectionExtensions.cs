@@ -39,7 +39,6 @@
 
         public static IServiceCollection AddNacosAspNetCore(
           this IServiceCollection services,
-          IConfiguration configuration,
           Action<NacosAspNetCoreOptions> nacosAspNetCoreOptions,
           Action<NacosOptions>  nacosOptions
           )
