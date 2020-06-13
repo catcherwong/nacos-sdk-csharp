@@ -37,10 +37,17 @@
             return services;
         }
 
+        /// <summary>
+        /// Add Nacos AspNetCore.
+        /// </summary>
+        /// <param name="services">services.</param>
+        /// <param name="nacosAspNetCoreOptions">nacosAspNetCoreOptions.</param>
+        /// <param name="nacosOptions">nacosOptions</param>
+        /// <returns></returns>
         public static IServiceCollection AddNacosAspNetCore(
           this IServiceCollection services,
           Action<NacosAspNetCoreOptions> nacosAspNetCoreOptions,
-          Action<NacosOptions>  nacosOptions
+          Action<NacosOptions> nacosOptions
           )
         {
             services.Configure(nacosAspNetCoreOptions);
@@ -53,7 +60,7 @@
 
             services.AddSingleton<INacosServerManager, NacosServerManager>();
 
-            services.AddSingleton<ILocalConfigInfoProcessor,MemoryLocalConfigInfoProcessor>();
+            services.AddSingleton<ILocalConfigInfoProcessor, MemoryLocalConfigInfoProcessor>();
             services.TryAddSingleton<Nacos.Config.Http.IHttpAgent, Nacos.Config.Http.ServerHttpAgent>();
             services.AddSingleton<INacosConfigClient, NacosConfigClient>();
             // IHostedService, report instance status
