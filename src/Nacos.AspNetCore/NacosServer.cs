@@ -1,7 +1,9 @@
 ﻿namespace Nacos.AspNetCore
 {
-    internal class NacosServer
+    public class NacosServer
     {
         public string Url { get; set; }
+
+        public double Weight { get; set; }
     }
 }
