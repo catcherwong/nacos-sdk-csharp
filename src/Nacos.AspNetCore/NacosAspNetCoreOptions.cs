@@ -57,5 +57,10 @@
         /// the metadata of this instance
         /// </summary>
         public Dictionary<string,string> Metadata { get; set; }
+
+        /// <summary>
+        /// Load Balance Strategy
+        /// </summary>
+        public string LBStrategy { get; set; } = LBStrategyName.WeightRandom.ToString();
     }
 }

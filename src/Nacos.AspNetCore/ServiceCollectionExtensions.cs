@@ -31,6 +31,10 @@
 
             services.AddSingleton<INacosServerManager, NacosServerManager>();
 
+            // load balance strategies
+            services.AddSingleton<ILBStrategy, WeightRandomLBStrategy>();
+            services.AddSingleton<ILBStrategy, WeightRoundRobinLBStrategy>();
+
             // IHostedService, report instance status
             services.AddHostedService<StatusReportBgTask>();
 
@@ -60,9 +64,14 @@
 
             services.AddSingleton<INacosServerManager, NacosServerManager>();
 
+            // load balance strategies
+            services.AddSingleton<ILBStrategy, WeightRandomLBStrategy>();
+            services.AddSingleton<ILBStrategy, WeightRoundRobinLBStrategy>();
+
             services.AddSingleton<ILocalConfigInfoProcessor, MemoryLocalConfigInfoProcessor>();
             services.TryAddSingleton<Nacos.Config.Http.IHttpAgent, Nacos.Config.Http.ServerHttpAgent>();
             services.AddSingleton<INacosConfigClient, NacosConfigClient>();
+
             // IHostedService, report instance status
             services.AddHostedService<StatusReportBgTask>();
 
