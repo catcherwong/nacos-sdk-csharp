@@ -13,7 +13,8 @@
     <RepositoryUrl>https://github.com/catcherwong/nacos-sdk-csharp</RepositoryUrl>
     <ProjectUrl>https://github.com/catcherwong/nacos-sdk-csharp</ProjectUrl>
     <PackageReleaseNotes>
-      1. Downgrade dependencies 3.1.0.
+      1. IHostedService.
+      2. LoadBalance Strategy.
     </PackageReleaseNotes>
   </PropertyGroup>
 
