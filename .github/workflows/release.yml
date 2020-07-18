@@ -37,9 +37,9 @@ jobs:
           with:
             name: nugetpkgs
         - name: list nugetpkgs
-            run: ls nugetpkgs
+          run: ls nugetpkgs
         - name: test dotnet cmd
-            run: dotnet --version  
+          run: dotnet --version  
         - name: Release
           run: |
             for file in nugetpkgs/*.nupkg
