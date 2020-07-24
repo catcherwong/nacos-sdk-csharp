@@ -2,6 +2,8 @@
 
 Unofficial csharp(dotnet core) implementation of [nacos](https://nacos.io/) OpenAPI.
 
+# This project was moved to https://github.com/nacos-group/nacos-sdk-csharp
+
 ![](https://img.shields.io/nuget/v/nacos-sdk-csharp-unofficial.svg)
 
 ![](./media/prj.png)
